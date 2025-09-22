@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/mentor/mentor.css">
+    <link rel="stylesheet" href="/mentor/layout.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>MentorX - Mentee Requests</title>
+    <style>
+        /* --- Page Layout --- */
+        .parent {
+            display: grid;
+            /* Sidebar | Main Content | Right Panel */
+            grid-template-columns: 250px 1fr 360px; 
+            width: 100%;
+            height: 100vh;
+        }
+
+        .div1, .div2, .div3 {
+            height: 100vh;
+            overflow-y: auto; /* Enable scrolling for each column if content overflows */
+        }
+
+        /* On smaller screens, the right panel is hidden to provide more space */
+        @media (max-width: 1200px) {
+            .parent {
+                grid-template-columns: 250px 1fr;
+            }
+            .div3 {
+                display: none;
+            }
+        }
+        
+        /* General Styles for the Page */
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --success-color: #10b981;
+            --success-hover: #059669;
+            --danger-color: #ef4444;
+            --danger-hover: #dc2626;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #334155;
+            --heading-color: #1e293b;
+            --border-color: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
+        /* Styles for DIV 2 (Main Content) */
+        .div2 {
+            padding: 2rem;
+            background-color: var(--bg-color);
+        }
+
+        .header {
+            margin-bottom: 2rem;
+        }
+        .header h2 {
+            color: var(--heading-color);
+            font-size: 2rem;
+            margin: 0;
+        }
+        .header p {
+            color: var(--text-color);
+            font-size: 1rem;
+        }
+
+        /* Request Cards */
+        .requests-list {
+            display: grid;
+            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Responsive grid */
+        }
+
+        .request-card {
+            background-color: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .request-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
+        }
+        .request-header img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 2px solid var(--primary-color);
+        }
+        .request-header .mentee-info h4 {
+            margin: 0;
+            color: var(--heading-color);
+            font-size: 1.25rem;
+        }
+        .request-header .mentee-info p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: var(--text-color);
+        }
+
+        .request-details {
+            margin-bottom: 1.5rem;
+            flex-grow: 1; /* Allows card to expand and push buttons to bottom */
+        }
+        .request-details p {
+            margin: 0.5rem 0;
+            line-height: 1.5;
+        }
+        .request-details strong {
+            color: var(--heading-color);
+        }
+
+        .request-actions {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: auto; /* Pushes action buttons to the bottom */
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .btn {
+            padding: 0.75rem 1.25rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            flex: 1; /* Makes buttons take equal width */
+        }
+
+        .btn-accept {
+            background-color: var(--success-color);
+            color: white;
+        }
+        .btn-accept:hover {
+            background-color: var(--success-hover);
+        }
+
+        .btn-reject {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        .btn-reject:hover {
+            background-color: var(--danger-hover);
+        }
+
+        /* Styles for DIV 3 (Right Panel) */
+        .div3 {
+            padding: 2rem;
+            border-left: 1px solid var(--border-color);
+            background-color: #fdfdff;
+        }
+
+        .dashboard-section {
+            background-color: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+        .dashboard-section h3 {
+            margin-top: 0;
+            margin-bottom: 1rem;
+            color: var(--heading-color);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.75rem;
+        }
+
+        .stats-summary p {
+            margin: 0.75rem 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.95rem;
+        }
+        .stats-summary strong {
+            color: var(--primary-color);
+            font-size: 1.1rem;
+        }
+
+        .tip-card {
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: var(--text-color);
+        }
+        .tip-card ul {
+            padding-left: 1.25rem;
+            margin: 0.5rem 0;
+        }
+        .tip-card li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 1024px) {
+            .requests-list {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            }
+        }
+        @media (max-width: 768px) {
+            .div2, .div3 {
+                padding: 1rem;
+            }
+            .requests-list {
+                grid-template-columns: 1fr; /* Stack requests on small screens */
+            }
+            .request-actions {
+                flex-direction: column;
+            }
+            .btn {
+                width: 100%;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    
+<div class="parent">
+    <div class="div1">
+        <h1>MentorX</h1>
+        <hr>
+        <nav>
+            <ul>
+                <li><a href="/mentor/Mentor.html"><i class="fa-solid fa-house"></i> Dashboard</a></li>
+                <li><a href="/mentor/mymentees.html"><i class="fa-solid fa-user-group"></i> My mentees</a></li>
+                <li><a href="/mentor/request.html" class="active"><i class="fa-solid fa-bell"></i> Requests</a></li>
+                <li><a href="/mentor/message.html"><i class="fa-solid fa-envelope"></i> Messages</a></li>
+                <li><a href="/mentor/session.html"><i class="fa-solid fa-calendar"></i> Sessions</a></li>
+                <li><a href="/mentor/settings.html"><i class="fa-solid fa-gear"></i> Settings</a></li>
+            </ul>
+        </nav>
+    </div>
+    <div class="div2">
+        <header class="header">
+            <h2>Mentee Requests</h2>
+            <p>Review and manage incoming mentorship requests from potential mentees.</p>
+        </header>
+        <div class="requests-list" id="requestsListContainer">
+            <!-- Dynamic requests will be loaded here -->
+            <p>Loading requests...</p>
+        </div>
+    </div>
+    <div class="div3">
+        <div class="dashboard-section">
+            <h3>Request Summary</h3>
+            <div class="stats-summary">
+                <p>Total Pending: <strong id="pendingCount">0</strong></p>
+            </div>
+        </div>
+        <div class="dashboard-section tip-card">
+            <h3>Mentoring Tip</h3>
+             <p>When reviewing requests, consider their learning goals, enthusiasm, and the time commitment you can realistically offer. A good match is key!</p>
+        </div>
+    </div>
+</div>
+    
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.location.href = '/login.html';
+        return;
+    }
+
+    const API_BASE_URL = 'http://localhost:5000/api';
+    const headers = { 'Content-Type': 'application/json', 'x-auth-token': token };
+
+    const requestsListContainer = document.getElementById('requestsListContainer');
+    const pendingCountElement = document.getElementById('pendingCount');
+
+    // --- Fetch and Render All Mentee Requests ---
+    const fetchAndRenderRequests = async () => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/mentor/requests`, { headers });
+            if (!response.ok) throw new Error('Failed to fetch requests');
+            
+            const requests = await response.json();
+            
+            requestsListContainer.innerHTML = ''; // Clear loading message
+            pendingCountElement.textContent = requests.length;
+
+            if (requests.length === 0) {
+                requestsListContainer.innerHTML = '<p>You have no pending mentee requests.</p>';
+                return;
+            }
+
+            requests.forEach(request => {
+                const card = document.createElement('div');
+                card.className = 'request-card';
+                card.id = `request-${request._id}`;
+                
+                const sentDate = new Date(request.sent_date).toLocaleDateString('en-US', {
+                    year: 'numeric', month: 'short', day: 'numeric'
+                });
+
+                card.innerHTML = `
+                    <div class="request-header">
+                        <img src="https://i.pravatar.cc/70?u=${request.mentee.email}" alt="${request.mentee.name}">
+                        <div class="mentee-info">
+                            <h4>${request.mentee.name}</h4>
+                            <p>Email: ${request.mentee.email}</p>
+                        </div>
+                    </div>
+                    <div class="request-details">
+                        <p><strong>Goal:</strong> ${request.goal}</p>
+                        <p><strong>Message:</strong> "${request.message}"</p>
+                        <p><strong>Sent:</strong> ${sentDate}</p>
+                    </div>
+                    <div class="request-actions">
+                        <button class="btn btn-accept" data-request-id="${request._id}"><i class="fa-solid fa-check"></i> Accept</button>
+                        <button class="btn btn-reject" data-request-id="${request._id}"><i class="fa-solid fa-xmark"></i> Reject</button>
+                    </div>
+                `;
+                requestsListContainer.appendChild(card);
+            });
+        } catch (error) {
+            console.error('Error fetching requests:', error);
+            requestsListContainer.innerHTML = '<p>Could not load requests. Please try again later.</p>';
+        }
+    };
+
+    // --- Handle Accept/Reject Actions ---
+    const handleRequestAction = async (requestId, action) => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/mentor/requests/${requestId}`, {
+                method: 'POST',
+                headers,
+                body: JSON.stringify({ status: action }) // 'accepted' or 'rejected'
+            });
+
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.msg || 'Failed to process request');
+            
+            alert(`Request ${action} successfully!`);
+            
+            // Remove the card from the UI
+            const cardToRemove = document.getElementById(`request-${requestId}`);
+            if (cardToRemove) {
+                cardToRemove.remove();
+            }
+
+            // Update the pending count
+            const currentCount = parseInt(pendingCountElement.textContent, 10);
+            pendingCountElement.textContent = Math.max(0, currentCount - 1);
+
+        } catch (error) {
+            console.error(`Error ${action}ing request:`, error);
+            alert(`Error: ${error.message}`);
+        }
+    };
+
+    // --- Event Listener for Action Buttons ---
+    requestsListContainer.addEventListener('click', (e) => {
+        const button = e.target.closest('.btn');
+        if (!button) return;
+
+        const requestId = button.dataset.requestId;
+        if (!requestId) return;
+
+        if (button.classList.contains('btn-accept')) {
+            if (confirm('Are you sure you want to accept this mentee?')) {
+                handleRequestAction(requestId, 'accepted');
+            }
+        } else if (button.classList.contains('btn-reject')) {
+            if (confirm('Are you sure you want to reject this mentee?')) {
+                handleRequestAction(requestId, 'rejected');
+            }
+        }
+    });
+
+    // --- Initial Load ---
+    fetchAndRenderRequests();
+});
+</script>
+</body>
+</html>
+

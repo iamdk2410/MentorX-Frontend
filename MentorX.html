@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="MentorX.css"> 
+    <link rel="icon" href="MentorX_Logo_Design-removebg-preview.png">
+    <title>MentorX</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    
+<div id="loading-screen" class="loading-screen">
+    <img src="images/MentorX_Logo_Design_1_-removebg-preview(1).png" alt="MentorX Logo" class="loading-logo">
+    <p>Loading MentorX...</p>
+</div>
+
+    <header class="header reveal">
+        <img src="images/MentorX_Logo_Design_1_-removebg-preview(1).png" alt="MentorX Logo" class="header-logo">
+        <div class="header-buttons">
+            <a href="register.html" class="btn btn-primary-outline">Join as Mentee</a>
+            <a href="register.html" class="btn btn-primary-outline">Join as Mentor</a>
+            <a href="login.html" class="btn btn-primary">Login</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="main-content-area">
+            <div class="main-container reveal">
+                <div class="left-section">
+                    <div class="left-section-inner">
+                        <h1>One Stop Solution To Your Dream Job</h1>
+                        <p>
+                            At MentorX, we believe that every learner has the potential to achieve their dream career—with the right guidance and tools. Our platform is your all-in-one hub for skill-building, practice, and mentorship.
+                        </p>
+                        <p>
+                           Whether you're preparing for competitive exams or leveling up your coding skills, MentorX offers personalized support at every step.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="right-grid">
+                    <div class="info-card">
+                        <h3 class="info-card-title">Test Preparation</h3>
+                        <p class="info-card-description">
+                            Prepare smarter with MentorX! We connect you with expert mentors for personalized guidance, mock tests, and focused study plans.
+                        </p>
+                    </div>
+
+                    <div class="info-card">
+                        <h3 class="info-card-title">Code with Confidence</h3>
+                        <p class="info-card-description">
+                           Master coding with expert mentors who guide you through logic building, real-world projects, and interview prep in any language.
+                        </p>
+                    </div>
+
+                    <div class="info-card">
+                        <h3 class="info-card-title">Career Guidance</h3>
+                        <p class="info-card-description">
+                            Our mentors help you discover the right career path. From resume building to soft skills, we prepare you for the real world.
+                        </p>
+                    </div>
+
+                    <div class="info-card">
+                        <h3 class="info-card-title">Doubt Solving</h3>
+                        <p class="info-card-description">
+                            Stuck on a tough concept? Get instant help from mentors who explain topics in simple, relatable ways to make learning stress-free.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="partner-section reveal">
+            <h4>Partnered Up with</h4>
+            <h3>Sri Manakula Vinayagar Engineering College</h3>
+        </div>
+
+        <div class="section how-it-works reveal">
+            <h2>How It Works</h2>
+            <div class="cards">
+                <div class="card">
+                    <h3>Mentee</h3>
+                    <p>Register, find mentors by course, send a request, and start your personalized learning journey!</p>
+                </div>
+                <div class="card">
+                    <h3>Mentor</h3>
+                    <p>Register, get approved by our admin team, accept mentee requests, and begin making an impact.</p>
+                </div>
+                <div class="card">
+                    <h3>Admin</h3>
+                    <p>Approve mentor applications, manage platform users, and ensure the highest quality of mentorship.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section why-choose-us reveal">
+            <h2>Why Choose MentorX?</h2>
+            <ul class="styled-list">
+                <li>Personalized learning experience</li>
+                <li>Verified and admin-approved mentors only</li>
+                <li>Integrated messaging and dashboards</li>
+                <li>Courses across tech, business, arts & more</li>
+            </ul>
+        </div>
+
+        <div class="cta-section reveal">
+            <h2>Start your learning journey today!</h2>
+            <a href="register.html" class="cta-button">Register Now</a>
+        </div>
+
+        <div class="section testimonials reveal">
+            <h2>What Our Users Say</h2>
+            <div class="testimonial-cards">
+                <div class="testimonial-card">
+                    <p>“MentorX helped me land my dream job! The mentors are amazing and the practice challenges are spot on.”</p>
+                    <span>- A Proud Mentee</span>
+                </div>
+                <div class="testimonial-card">
+                    <p>“As a mentor, I love giving back and helping students grow. The platform makes it easy to connect and guide.”</p>
+                    <span>- An Experienced Mentor</span>
+                </div>
+            </div>
+        </div>
+    
+
+    </main>
+    
+    <footer class="footer">
+        <p>© 2025 MentorX. All rights reserved.</p>
+        <p>An unit of Spectrum Syntax</p>
+        <p><a href="PrivacyPolicy.html" class="footer-link">Privacy Policy</a> | <a href="#" class="footer-link">Contact</a></p>
+    </footer>
+
+    <script>
+        // Loading screen logic
+        window.addEventListener('load', () => {
+            const loadingScreen = document.getElementById('loading-screen');
+            setTimeout(() => {
+                loadingScreen.classList.add('hidden');
+            }, 500); // Small delay to ensure content is rendered
+        });
+
+        // Scroll animation logic
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, {
+            threshold: 0.1 
+        });
+
+        document.querySelectorAll('.reveal').forEach(el => {
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
+

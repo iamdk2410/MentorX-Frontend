@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/mentee/mymentor.css">
+    <link rel="stylesheet" href="/mentee/layout.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>MentorX - Find a Mentor</title>
+    <style>
+        /* --- Modal Styles --- */
+        .modal {
+            display: none; 
+            position: fixed;
+            z-index: 9999;
+            left: 0; top: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: #fff;
+            padding: 25px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            animation: slideUp 0.3s ease;
+            position: relative;
+        }
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #666;
+        }
+        .close:hover { color: #000; }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-content h2 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .modal-content .input-group {
+            margin-bottom: 15px;
+        }
+        .modal-content label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+        }
+        .modal-content input, .modal-content textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box; /* Important */
+        }
+        .modal-content textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .view-btn, .request-btn {
+            background: #007BFF;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+        .view-btn:hover, .request-btn:hover {
+            background: #0056b3;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+        }
+        
+        /* --- Recommended Section Styles --- */
+        .recommended-section {
+            background-color: #eef2ff;
+            border: 1px solid #c7d2fe;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+        .recommended-section h2 {
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            color: #4338ca;
+            font-size: 1.5rem;
+        }
+        .recommended-section h2 .fa-star {
+            color: #f59e0b;
+        }
+    </style>
+</head>
+<body>
+    
+<div class="parent">
+    <div class="div1">
+        <h1>MentorX</h1>
+        <hr>
+        <nav>
+            <ul>
+                <li><a href="/mentee/mentee.html"><i class="fa-solid fa-house"></i> Dashboard</a></li>
+                <li><a href="/mentee/mymentor.html"><i class="fa-solid fa-user-group"></i> My mentors</a></li>
+                <li><a href="/mentee/findaMentor.html" class="active"><i class="fa-solid fa-magnifying-glass"></i> Find a mentor</a></li>
+                <li><a href="/mentee/task.html"><i class="fa-solid fa-list-check"></i> Tasks</a></li>
+                <li><a href="/mentee/session.html"><i class="fa-solid fa-calendar"></i> Sessions</a></li>
+                <li><a href="/mentee/message.html"><i class="fa-solid fa-envelope"></i> Messages</a></li>
+                <li><a href="/mentee/settings.html"><i class="fa-solid fa-gear"></i> Settings</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <div class="div2">
+        <div class="topbar">
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="mentorSearch" placeholder="Search for mentors, topics...">
+            </div>
+        </div>
+
+        <div class="recommended-section" id="recommendedSection">
+            <h2><i class="fa-solid fa-star"></i> Recommended For You</h2>
+            <div class="mentorList" id="suggestedMentorsContainer">
+                <p>Loading recommendations...</p>
+            </div>
+        </div>
+
+        <hr style="margin-bottom: 2rem; border-color: var(--border-color);">
+
+        <div class="mentorList" id="mentorListContainer">
+            <p>Loading all mentors...</p>
+        </div>
+    </div>
+</div>
+
+<div id="requestModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2 id="requestModalTitle">Send Request</h2>
+        <form id="requestForm">
+            <div class="input-group">
+                <label for="goal">Your Goal</label>
+                <input type="text" id="goal" placeholder="e.g., Learn Web Development Basics" required>
+            </div>
+            <div class="input-group">
+                <label for="message">Message</label>
+                <textarea id="message" placeholder="Introduce yourself and why you want to connect." required></textarea>
+            </div>
+            <button type="submit" class="request-btn" style="width: 100%; padding: 12px;">Confirm & Send Request</button>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.location.href = '../login.html';
+        return;
+    }
+
+    const API_BASE_URL = 'http://localhost:5000/api';
+    const headers = { 'Content-Type': 'application/json', 'x-auth-token': token };
+
+    const mentorListContainer = document.getElementById('mentorListContainer');
+    const suggestedMentorsContainer = document.getElementById('suggestedMentorsContainer');
+    const requestModal = document.getElementById('requestModal');
+    const requestModalTitle = document.getElementById('requestModalTitle');
+    const requestForm = document.getElementById('requestForm');
+    const closeBtn = requestModal.querySelector('.close');
+    let currentMentorId = null;
+
+    const renderMentorCards = (container, mentors) => {
+        container.innerHTML = '';
+        if (mentors.length === 0) {
+            container.innerHTML = '<p>No mentors found.</p>';
+            return;
+        }
+        mentors.forEach(mentor => {
+            const card = document.createElement('div');
+            card.className = 'mentorListCard';
+            const courses = (mentor.mentorDetails && mentor.mentorDetails.specializedCourses) 
+                            ? mentor.mentorDetails.specializedCourses.join(' | ') 
+                            : 'No courses specified';
+            
+            card.innerHTML = `
+                <h3><i class="fa-solid fa-user"></i> ${mentor.name}</h3>
+                <h4>Mentoring Courses</h4>
+                <h5>${courses}</h5>
+                <br>
+                <button class="request-btn" data-mentor-id="${mentor._id}" data-mentor-name="${mentor.name}">Send Request</button>
+            `;
+            container.appendChild(card);
+        });
+    };
+    
+    const fetchAndRenderSuggestedMentors = async () => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/mentee/suggested-mentors`, { headers });
+            if (!response.ok) throw new Error('Failed to fetch suggestions');
+            const suggestedMentors = await response.json();
+            
+            if (suggestedMentors.length > 0) {
+                renderMentorCards(suggestedMentorsContainer, suggestedMentors);
+            } else {
+                 document.getElementById('recommendedSection').style.display = 'none';
+            }
+        } catch (error) {
+            console.error('Error fetching suggested mentors:', error);
+            suggestedMentorsContainer.innerHTML = '<p>Could not load recommendations.</p>';
+        }
+    };
+
+    const fetchAndRenderMentors = async () => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/mentee/mentors`, { headers });
+            if (!response.ok) throw new Error('Failed to fetch mentors');
+            const mentors = await response.json();
+            renderMentorCards(mentorListContainer, mentors);
+        } catch (error) {
+            console.error('Error fetching mentors:', error);
+            mentorListContainer.innerHTML = '<p>Could not load mentors. Please try again later.</p>';
+        }
+    };
+
+    const openRequestModal = (mentorId, mentorName) => {
+        currentMentorId = mentorId;
+        requestModalTitle.textContent = `Send Request to ${mentorName}`;
+        requestForm.reset();
+        requestModal.style.display = 'flex';
+    };
+
+    const closeRequestModal = () => {
+        requestModal.style.display = 'none';
+        currentMentorId = null;
+    };
+
+    const handleSendRequest = async (e) => {
+        e.preventDefault();
+        if (!currentMentorId) return;
+        const goal = document.getElementById('goal').value;
+        const message = document.getElementById('message').value;
+        try {
+            const response = await fetch(`${API_BASE_URL}/mentee/request-mentor`, {
+                method: 'POST',
+                headers,
+                body: JSON.stringify({ mentorId: currentMentorId, goal, message })
+            });
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.msg || 'Failed to send request');
+            alert('Mentorship request sent successfully!');
+            closeRequestModal();
+        } catch (error) {
+            console.error('Error sending request:', error);
+            alert(`Error: ${error.message}`);
+        }
+    };
+    
+    document.body.addEventListener('click', (e) => {
+        if (e.target.classList.contains('request-btn')) {
+            const mentorId = e.target.dataset.mentorId;
+            const mentorName = e.target.dataset.mentorName;
+            openRequestModal(mentorId, mentorName);
+        }
+    });
+
+    closeBtn.addEventListener('click', closeRequestModal);
+    window.addEventListener('click', (e) => {
+        if (e.target === requestModal) closeRequestModal();
+    });
+    requestForm.addEventListener('submit', handleSendRequest);
+
+    document.getElementById('mentorSearch').addEventListener('keyup', function() {
+        const searchTerm = this.value.toLowerCase();
+        document.querySelectorAll('.mentorListCard').forEach(card => {
+            const cardText = card.textContent.toLowerCase();
+            card.style.display = cardText.includes(searchTerm) ? '' : 'none';
+        });
+    });
+
+    fetchAndRenderSuggestedMentors();
+    fetchAndRenderMentors();
+});
+</script>
+
+</body>
+</html>
+

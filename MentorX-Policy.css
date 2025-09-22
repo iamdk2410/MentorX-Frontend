@@ -1,0 +1,191 @@
+/* --- General Body and Font Styles --- */
+body {
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #F9FAFB; /* Light Gray Background */
+    color: #1F2937; /* Dark Text */
+    line-height: 1.6;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+a {
+    text-decoration: none;
+}
+
+/* --- Header --- */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    padding: 1rem 2.5rem;
+    border-bottom: 1px solid #E5E7EB;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+}
+
+.header-logo {
+    width: 180px;
+    height: auto;
+}
+
+.header-buttons {
+    display: flex;
+    gap: 1rem;
+}
+
+.btn {
+    padding: 0.7rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-block;
+    border: 1px solid transparent;
+}
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.btn-primary {
+    background-color: #4F46E5; /* Primary Indigo */
+    color: white;
+}
+.btn-primary:hover {
+    background-color: #4338CA; /* Darker Indigo */
+}
+
+.btn-primary-outline {
+    background-color: transparent;
+    color: #4F46E5;
+    border-color: #4F46E5;
+}
+.btn-primary-outline:hover {
+    background-color: #E0E7FF; /* Light Indigo background */
+}
+
+/* --- Privacy Policy Container --- */
+.privacy-policy-container {
+    max-width: 800px;
+    margin: 4rem auto;
+    padding: 3rem;
+    background-color: #FFFFFF;
+    border-radius: 1rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.privacy-policy-container h1 {
+    font-size: 2.5em;
+    color: #111827;
+    margin-bottom: 1rem;
+    text-align: center;
+    font-weight: 800;
+}
+
+.privacy-policy-container .last-updated {
+    text-align: center;
+    font-size: 0.9em;
+    color: #6B7280;
+    margin-bottom: 3rem;
+}
+
+.privacy-policy-container section {
+    margin-bottom: 2.5rem;
+}
+
+.privacy-policy-container h2 {
+    font-size: 1.5em;
+    color: #1F2937;
+    margin-top: 0;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #E5E7EB;
+    font-weight: 700;
+}
+
+.privacy-policy-container p {
+    margin-bottom: 1rem;
+    font-size: 1rem;
+    color: #374151;
+    line-height: 1.7;
+}
+
+.privacy-policy-container ul {
+    list-style: none;
+    padding-left: 0;
+    margin-bottom: 1rem;
+}
+
+.privacy-policy-container li {
+    margin-bottom: 0.75rem;
+    position: relative;
+    padding-left: 1.75rem;
+}
+.privacy-policy-container li::before {
+    content: '•';
+    color: #4F46E5;
+    font-size: 1.5rem;
+    position: absolute;
+    left: 0;
+    top: -0.25rem;
+}
+
+.privacy-policy-container strong {
+    color: #111827;
+    font-weight: 600;
+}
+
+.privacy-policy-container a {
+    color: #4F46E5;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.privacy-policy-container a:hover {
+    text-decoration: underline;
+}
+
+/* --- Footer --- */
+.footer {
+    background-color: #111827; /* Darker footer */
+    color: #9CA3AF;
+    text-align: center;
+    padding: 2.5rem 1.5rem;
+    margin-top: 4rem;
+}
+
+.footer p {
+    margin: 0.25rem 0;
+}
+
+.footer-link {
+    color: #A5B4FC;
+    text-decoration: none;
+}
+
+.footer-link:hover {
+    text-decoration: underline;
+}
+
+/* --- Responsive Media Queries --- */
+@media (max-width: 767px) {
+    .header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    .privacy-policy-container {
+        margin: 2rem 1rem;
+        padding: 1.5rem;
+    }
+    .privacy-policy-container h1 {
+        font-size: 2em;
+    }
+}

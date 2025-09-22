@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/mentee/mymentor.css">
+    <link rel="stylesheet" href="/mentee/layout.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>MentorX - My Mentor</title>
+</head>
+<body>
+    
+<div class="parent">
+    <div class="div1">
+        <h1>MentorX</h1>
+        <hr>
+        <nav>
+            <ul>
+                <li><a href="/mentee/Mentee.html"><i class="fa-solid fa-house"></i> Dashboard</a></li>
+                <li><a href="/mentee/mymentor.html" class="active"><i class="fa-solid fa-user-group"></i> My mentors</a></li>
+                <li><a href="/mentee/findaMentor.html"><i class="fa-solid fa-magnifying-glass"></i> Find a mentor</a></li>
+                <li><a href="/mentee/task.html"><i class="fa-solid fa-list-check"></i> Tasks</a></li>
+                <li><a href="/mentee/session.html"><i class="fa-solid fa-calendar"></i> Sessions</a></li>
+                <li><a href="/mentee/message.html"><i class="fa-solid fa-envelope"></i> Messages</a></li>
+                <li><a href="/mentee/settings.html"><i class="fa-solid fa-gear"></i> Settings</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <div class="div2" id="mainContent">
+        <div class="topbar">
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="mentorSearch" placeholder="Search for your mentor...">
+            </div>
+        </div>
+
+        <div class="mentorList" id="mentorListContainer">
+            <p>Loading your mentor details...</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    // This function will navigate to a detailed profile page for the mentor
+    function viewProfile(mentorId) {
+        // This can link to a new page you create for viewing mentor profiles
+        window.location.href = `mentor-profile.html?id=${encodeURIComponent(mentorId)}`;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = '/login.html';
+            return;
+        }
+
+        const API_BASE_URL = 'http://localhost:5000/api';
+        const headers = { 'Content-Type': 'application/json', 'x-auth-token': token };
+        
+        const mentorListContainer = document.getElementById('mentorListContainer');
+        const mentorSearchInput = document.getElementById('mentorSearch');
+
+        // --- Fetch and Render the Mentee's Accepted Mentor ---
+        const fetchAndRenderMentor = async () => {
+            try {
+                // First, get the logged-in user's data to find their mentor's ID
+                const authResponse = await fetch(`${API_BASE_URL}/auth`, { headers });
+                if (!authResponse.ok) throw new Error('Could not fetch your profile.');
+                const mentee = await authResponse.json();
+
+                const mentorId = mentee.menteeDetails ? mentee.menteeDetails.mentor : null;
+
+                if (!mentorId) {
+                    mentorListContainer.innerHTML = '<p>You do not have an active mentor yet.</p>';
+                    return;
+                }
+
+                // Now, fetch all approved mentors to find the details of this specific mentor
+                const mentorsResponse = await fetch(`${API_BASE_URL}/mentee/mentors`, { headers });
+                if (!mentorsResponse.ok) throw new Error('Could not fetch mentor list.');
+                const allMentors = await mentorsResponse.json();
+
+                const myMentor = allMentors.find(m => m._id === mentorId);
+
+                mentorListContainer.innerHTML = ''; // Clear loading message
+
+                if (myMentor) {
+                    const card = document.createElement('div');
+                    card.className = 'mentorListCard';
+                    
+                    const courses = (myMentor.mentorDetails && myMentor.mentorDetails.specializedCourses)
+                                    ? myMentor.mentorDetails.specializedCourses.join(' | ')
+                                    : 'No courses specified';
+
+                    card.innerHTML = `
+                        <h3><i class="fa-solid fa-user"></i> ${myMentor.name}</h3>
+                        <h4>Mentoring Courses</h4>
+                        <h5>${courses}</h5>
+                        <br>
+                        <button class="request-btn" onclick="viewProfile('${myMentor._id}')">View Profile</button>
+                    `;
+                    mentorListContainer.appendChild(card);
+                } else {
+                    mentorListContainer.innerHTML = '<p>Your assigned mentor could not be found.</p>';
+                }
+
+            } catch (error) {
+                console.error('Error fetching mentor:', error);
+                mentorListContainer.innerHTML = '<p>Could not load your mentor details. Please try again later.</p>';
+            }
+        };
+
+        // --- Search Bar Functionality ---
+        mentorSearchInput.addEventListener('keyup', function() {
+            const searchTerm = this.value.toLowerCase();
+            const mentorCards = document.querySelectorAll('.mentorListCard');
+
+            mentorCards.forEach(card => {
+                const cardText = card.textContent.toLowerCase();
+                if (cardText.includes(searchTerm)) {
+                    card.style.display = ""; 
+                } else {
+                    card.style.display = "none"; 
+                }
+            });
+        });
+
+        // --- Initial Load ---
+        fetchAndRenderMentor();
+    });
+</script>
+    
+</body>
+</html>

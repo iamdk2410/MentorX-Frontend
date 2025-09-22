@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/mentee/mymentor.css">
+    <link rel="stylesheet" href="/mentee/layout.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>MentorX - My Sessions</title>
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --secondary-color: #10b981;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #334155;
+            --heading-color: #1e293b;
+            --border-color: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            margin: 0;
+            background-color: var(--bg-color);
+        }
+
+        .parent {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            min-height: 100vh;
+        }
+
+        .div1 {
+            background-color: var(--card-bg);
+            border-right: 1px solid var(--border-color);
+            padding: 1.5rem;
+            color: var(--heading-color);
+        }
+        .div1 h1 {
+            font-size: 1.75rem;
+            color: var(--primary-color);
+            margin: 0 0 1.5rem 0;
+            text-align: center;
+        }
+        .div1 nav ul { list-style: none; padding: 0; margin: 0; }
+        .div1 nav a { display: flex; align-items: center; gap: 1rem; padding: 0.8rem 1rem; text-decoration: none; color: var(--text-color); font-weight: 500; border-radius: 8px; transition: background-color 0.3s, color 0.3s; }
+        .div1 nav a:hover { background-color: #f1f5f9; color: var(--heading-color); }
+        .div1 nav a.active { background-color: var(--primary-color); color: white; }
+        
+        .div2 { background-color: transparent; padding: 2rem; }
+        .header { margin-bottom: 2rem; }
+        .header h2 { font-size: 2rem; margin: 0; }
+        .header p { color: var(--text-color); font-size: 1rem; }
+
+        .filter-tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); }
+        .filter-tabs button { padding: 0.75rem 1.25rem; border: none; background-color: transparent; font-size: 1rem; font-weight: 600; color: var(--text-color); cursor: pointer; border-bottom: 3px solid transparent; transition: color 0.3s, border-color 0.3s; }
+        .filter-tabs button:hover { color: var(--primary-color); }
+        .filter-tabs button.active { color: var(--primary-color); border-bottom-color: var(--primary-color); }
+
+        .session-card { display: flex; align-items: center; justify-content: space-between; background-color: var(--card-bg); padding: 1.25rem; border: 1px solid var(--border-color); border-radius: 12px; margin-bottom: 1rem; box-shadow: var(--shadow); }
+        .session-info .title { font-weight: 600; color: var(--heading-color); margin:0; }
+        .session-info .details { font-size: 0.9rem; color: var(--text-color); margin: 0.25rem 0 0 0;}
+        .session-actions { display: flex; gap: 0.5rem; }
+
+        .btn { padding: 0.5rem 1rem; border: none; background-color: var(--primary-color); color: white; border-radius: 8px; cursor: pointer; font-weight: 500; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; transition: background-color 0.3s; }
+        .btn:hover { background-color: var(--primary-hover); }
+        .btn-secondary { background-color: #64748b; }
+        .btn-secondary:hover { background-color: #475569; }
+    </style>
+</head>
+<body>
+    
+<div class="parent">
+    <div class="div1">
+        <h1>MentorX</h1>
+        <hr>
+        <nav>
+            <ul>
+                <li><a href="/mentee/Mentee.html"><i class="fa-solid fa-house"></i> Dashboard</a></li>
+                <li><a href="/mentee/mymentor.html"><i class="fa-solid fa-user-group"></i> My mentors</a></li>
+                <li><a href="/mentee/findaMentor.html"><i class="fa-solid fa-magnifying-glass"></i> Find a mentor</a></li>
+                <li><a href="/mentee/task.html"><i class="fa-solid fa-list-check"></i> Tasks</a></li>
+                <li><a href="/mentee/session.html" class="active"><i class="fa-solid fa-calendar"></i> Sessions</a></li>
+                <li><a href="/mentee/message.html"><i class="fa-solid fa-envelope"></i> Messages</a></li>
+                <li><a href="/mentee/settings.html"><i class="fa-solid fa-gear"></i> Settings</a></li>
+            </ul>
+        </nav>
+    </div>
+    
+    <div class="div2">
+        <header class="header">
+            <h2>My Sessions</h2>
+            <p>A log of your upcoming and past mentorship sessions.</p>
+        </header>
+
+        <div class="filter-tabs">
+            <button class="active" data-filter="upcoming">Upcoming</button>
+            <button data-filter="past">Past</button>
+        </div>
+
+        <div class="sessions-container" id="sessionsContainer">
+            <p>Loading your sessions...</p>
+        </div>
+    </div>
+</div>
+    
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.location.href = '/login.html';
+        return;
+    }
+
+    const API_BASE_URL = 'http://localhost:5000/api';
+    const headers = { 'Content-Type': 'application/json', 'x-auth-token': token };
+
+    const sessionsContainer = document.getElementById('sessionsContainer');
+    const filterTabs = document.querySelectorAll('.filter-tabs button');
+
+    let allSessions = [];
+
+    const fetchAndRenderSessions = async () => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/mentee/sessions`, { headers });
+            if (!response.ok) throw new Error('Failed to fetch sessions');
+            
+            allSessions = await response.json();
+            renderSessions();
+            
+        } catch (error) {
+            console.error('Error fetching sessions:', error);
+            sessionsContainer.innerHTML = `<p>Error: ${error.message}</p>`;
+        }
+    };
+
+    const renderSessions = () => {
+        sessionsContainer.innerHTML = '';
+        if (allSessions.length === 0) {
+            sessionsContainer.innerHTML = '<p>You have no scheduled sessions.</p>';
+            return;
+        }
+
+        // --- CORRECTED DATE LOGIC ---
+        // Get today's date as a YYYY-MM-DD string to avoid timezone issues.
+        const todayString = new Date().toISOString().split('T')[0];
+
+        allSessions
+            // Sort upcoming sessions first (oldest to newest), then past sessions (newest to oldest)
+            .sort((a, b) => {
+                const dateA = new Date(a.date);
+                const dateB = new Date(b.date);
+                // If both are in the future, sort ascending. If both are in the past, sort descending.
+                if (dateA >= new Date(todayString) && dateB >= new Date(todayString)) {
+                    return dateA - dateB; 
+                }
+                return dateB - dateA;
+            })
+            .forEach(session => {
+                // Compare session date string with today's date string
+                const sessionDateString = new Date(session.date).toISOString().split('T')[0];
+                const sessionType = sessionDateString < todayString ? 'past' : 'upcoming';
+                
+                const card = document.createElement('div');
+                card.className = 'session-card';
+                card.dataset.sessionType = sessionType;
+                
+                const formattedDate = new Date(session.date).toLocaleDateString('en-US', {
+                    year: 'numeric', month: 'short', day: 'numeric'
+                });
+
+                card.innerHTML = `
+                    <div class="session-info">
+                        <div>
+                            <p class="title">${session.title}</p>
+                            <p class="details">With <strong>${session.mentor.name}</strong> on ${formattedDate} at ${session.time} (${session.duration} min)</p>
+                        </div>
+                    </div>
+                    <div class="session-actions">
+                        ${sessionType === 'upcoming'
+                            ? `<a href="${session.meetingLink}" target="_blank" class="btn"><i class="fa-solid fa-video"></i> Join Call</a>`
+                            : `<button class="btn btn-secondary" disabled><i class="fa-solid fa-check"></i> Completed</button>`
+                        }
+                    </div>`;
+                sessionsContainer.appendChild(card);
+            });
+
+        filterSessions('upcoming'); // Apply default filter
+    };
+
+    const filterSessions = (filter) => {
+        const sessionCards = document.querySelectorAll('.session-card');
+        let hasVisibleCards = false;
+        sessionCards.forEach(card => {
+            if (card.dataset.sessionType === filter) {
+                card.style.display = 'flex';
+                hasVisibleCards = true;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+        
+        const existingMessage = sessionsContainer.querySelector('.no-sessions-message');
+        if (existingMessage) existingMessage.remove();
+
+        if (!hasVisibleCards) {
+            const message = document.createElement('p');
+            message.className = 'no-sessions-message';
+            message.textContent = `No ${filter} sessions found.`;
+            sessionsContainer.appendChild(message);
+        }
+    };
+
+    filterTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            filterTabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            filterSessions(tab.dataset.filter);
+        });
+    });
+
+    fetchAndRenderSessions();
+});
+</script>
+</body>
+</html>
+

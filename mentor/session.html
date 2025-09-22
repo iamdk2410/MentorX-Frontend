@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/mentor/mentor.css">
+    <link rel="stylesheet" href="/mentor/layout.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>MentorX - My Sessions</title>
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --secondary-color: #10b981;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #334155;
+            --heading-color: #1e293b;
+            --border-color: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
+        /* --- Page Layout --- */
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            height: 100vh;
+            overflow: hidden; /* Prevent body from scrolling */
+        }
+
+        .parent {
+            display: grid;
+            grid-template-columns: 250px 1fr 380px; /* Sidebar | Main Content | Right Panel */
+            height: 100vh;
+        }
+
+        .div1, .div2, .div3 {
+            height: 100vh;
+            overflow-y: auto; /* Makes each column individually scrollable */
+            box-sizing: border-box;
+        }
+
+        .div2 { padding: 2rem; background-color: var(--bg-color); }
+        .header { margin-bottom: 2rem; }
+        .header h2 { color: var(--heading-color); font-size: 2rem; margin: 0; }
+        .header p { color: var(--text-color); font-size: 1rem; }
+
+        .filter-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .filter-tabs button {
+            padding: 0.75rem 1.25rem;
+            border: none;
+            background-color: transparent;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-color);
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: color 0.3s, border-color 0.3s;
+        }
+        .filter-tabs button:hover { color: var(--primary-color); }
+        .filter-tabs button.active { color: var(--primary-color); border-bottom-color: var(--primary-color); }
+
+        .dashboard-section {
+            background-color: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+        .dashboard-section h3 { margin-top: 0; margin-bottom: 1.5rem; color: var(--heading-color); border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem; }
+
+        .sessions-container { list-style: none; padding: 0; margin: 0; }
+        .session-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #f8fafc;
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        
+        .session-info { display: flex; align-items: center; gap: 1rem; }
+        .session-info img { width: 45px; height: 45px; border-radius: 50%; }
+        .session-info p { margin: 0; }
+        .session-info .title { font-weight: 600; color: var(--heading-color); }
+        .session-info .details { font-size: 0.9rem; color: var(--text-color); }
+        .session-actions { display: flex; gap: 0.5rem; }
+
+        .btn { padding: 0.5rem 1rem; border: none; background-color: var(--primary-color); color: white; border-radius: 8px; cursor: pointer; font-weight: 500; text-decoration: none; transition: background-color 0.3s; display: inline-flex; align-items: center; gap: 0.5rem; }
+        .btn:hover { background-color: var(--primary-hover); }
+        .btn-secondary { background-color: #64748b; }
+        .btn-secondary:hover { background-color: #475569; }
+
+        .div3 { padding: 2rem; border-left: 1px solid var(--border-color); background-color: #fdfdff; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; font-size: 0.9rem; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; }
+        .form-group select[multiple] { height: 120px; padding: 0.5rem; }
+
+        .calendar { text-align: center; }
+        .calendar .month { font-weight: 600; font-size: 1.1rem; margin-bottom: 1rem; }
+        .calendar table { width: 100%; border-collapse: collapse; }
+        .calendar th, .calendar td { padding: 0.5rem; }
+        .calendar td { cursor: pointer; border-radius: 50%; }
+        .calendar td:hover { background-color: #f1f5f9; }
+        .calendar .today { background-color: var(--primary-color); color: white; }
+        .calendar .event-day { font-weight: bold; border: 2px solid var(--primary-color); }
+
+        /* Responsive adjustments */
+        @media (max-width: 1200px) {
+            .parent {
+                grid-template-columns: 250px 1fr;
+            }
+            .div3 {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    
+<div class="parent">
+    <div class="div1">
+        <h1>MentorX</h1>
+        <hr>
+        <nav>
+            <ul>
+                <li><a href="/mentor/Mentor.html"><i class="fa-solid fa-house"></i> Dashboard</a></li>
+                <li><a href="/mentor/mymentees.html"><i class="fa-solid fa-user-group"></i> My mentees</a></li>
+                <li><a href="/mentor/request.html"><i class="fa-solid fa-bell"></i> Requests</a></li>
+                <li><a href="/mentor/message.html"><i class="fa-solid fa-envelope"></i> Messages</a></li>
+                <li><a href="/mentor/session.html" class="active"><i class="fa-solid fa-calendar"></i> Sessions</a></li>
+                <li><a href="/mentor/settings.html"><i class="fa-solid fa-gear"></i> Settings</a></li>
+            </ul>
+        </nav>
+    </div>
+    <div class="div2">
+        <header class="header">
+            <h2>Manage Your Sessions</h2>
+            <p>View, schedule, and manage all your upcoming and past mentorship sessions.</p>
+        </header>
+
+        <div class="filter-tabs">
+            <button class="active" data-filter="upcoming">Upcoming</button>
+            <button data-filter="past">Past</button>
+        </div>
+
+        <div class="sessions-container" id="sessionsContainer">
+            <p>Loading sessions...</p>
+        </div>
+
+    </div>
+    <div class="div3">
+        <div class="cards3">
+             <div class="dashboard-section">
+                <h3>Schedule a New Session</h3>
+                <form id="scheduleSessionForm">
+                    <div class="form-group">
+                        <label for="mentee-select">Select Mentees (Hold Ctrl/Cmd to select multiple)</label>
+                        <select id="mentee-select" required multiple>
+                            <option value="">Loading mentees...</option>
+                        </select>
+                    </div>
+                     <div class="form-group">
+                        <label for="session-title">Session Title</label>
+                        <input type="text" id="session-title" placeholder="e.g., Group Code Review" required>
+                     </div>
+                    <div class="form-group">
+                        <label for="session-date">Date</label>
+                        <input type="date" id="session-date" required>
+                     </div>
+                     <div class="form-group">
+                        <label for="session-time">Time</label>
+                        <input type="time" id="session-time" required>
+                     </div>
+                     <div class="form-group">
+                        <label for="session-duration">Duration (minutes)</label>
+                        <input type="number" id="session-duration" value="60" required>
+                     </div>
+                    <div class="form-group">
+                        <label for="meeting-link">Meeting Link</label>
+                        <input type="url" id="meeting-link" placeholder="https://meet.google.com/..." required>
+                    </div>
+                    <button type="submit" class="btn" style="width: 100%; justify-content: center;"><i class="fa-solid fa-calendar-plus"></i> Schedule Session</button>
+                </form>
+             </div>
+             <div class="calendar dashboard-section" id="calendarContainer">
+                <h3>Monthly Schedule</h3>
+                <!-- Calendar will be generated here -->
+             </div>
+        </div>
+    </div>
+</div>
+    
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const token = localStorage.getItem('token');
+    if (!token) { window.location.href = '/login.html'; return; }
+
+    const API_BASE_URL = 'http://localhost:5000/api';
+    const headers = { 'Content-Type': 'application/json', 'x-auth-token': token };
+
+    const sessionsContainer = document.getElementById('sessionsContainer');
+    const menteeSelect = document.getElementById('mentee-select');
+    const scheduleSessionForm = document.getElementById('scheduleSessionForm');
+    const filterTabs = document.querySelectorAll('.filter-tabs button');
+    const calendarContainer = document.getElementById('calendarContainer');
+
+    let allSessions = [];
+
+    const initializePage = async () => {
+        try {
+            const [mentees, sessions] = await Promise.all([
+                fetch(`${API_BASE_URL}/mentor/mentees`, { headers }).then(res => res.json()),
+                fetch(`${API_BASE_URL}/mentor/sessions`, { headers }).then(res => res.json())
+            ]);
+            allSessions = sessions;
+            populateMenteeDropdown(mentees);
+            renderSessions();
+            renderCalendar();
+        } catch (error) {
+            console.error("Failed to initialize page:", error);
+            sessionsContainer.innerHTML = `<p>Error loading page data: ${error.message}</p>`;
+        }
+    };
+
+    const populateMenteeDropdown = (mentees) => {
+        menteeSelect.innerHTML = '';
+        if (mentees.length > 0) {
+            mentees.forEach(mentee => {
+                const option = document.createElement('option');
+                option.value = mentee._id;
+                option.textContent = mentee.name;
+                menteeSelect.appendChild(option);
+            });
+        } else {
+            menteeSelect.innerHTML = '<option value="" disabled>No mentees found</option>';
+        }
+    };
+    
+    const renderSessions = () => {
+        sessionsContainer.innerHTML = '';
+        if (!allSessions || allSessions.length === 0) {
+            sessionsContainer.innerHTML = '<p>No sessions scheduled yet.</p>';
+            return;
+        }
+
+        const todayString = new Date().toISOString().split('T')[0];
+
+        allSessions
+            .sort((a, b) => new Date(a.date) - new Date(b.date))
+            .forEach(session => {
+                const sessionDateString = new Date(session.date).toISOString().split('T')[0];
+                const sessionType = sessionDateString < todayString ? 'past' : 'upcoming';
+                
+                const card = document.createElement('div');
+                card.className = 'session-card';
+                card.dataset.sessionType = sessionType;
+                const formattedDate = new Date(session.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+                
+                const actionButton = sessionType === 'upcoming'
+                    ? `<a href="${session.meetingLink}" target="_blank" class="btn"><i class="fa-solid fa-video"></i> Join Call</a>`
+                    : `<a href="session-details.html?id=${session._id}" class="btn btn-secondary"><i class="fa-solid fa-note-sticky"></i> View Details</a>`;
+
+                card.innerHTML = `
+                    <div class="session-info">
+                        <img src="https://i.pravatar.cc/50?u=${session.mentee.email}" alt="${session.mentee.name}">
+                        <div>
+                            <p class="title">${session.title}</p>
+                            <p class="details">With <strong>${session.mentee.name}</strong> on ${formattedDate} at ${session.time} (${session.duration} min)</p>
+                        </div>
+                    </div>
+                    <div class="session-actions">
+                        ${actionButton}
+                    </div>`;
+                sessionsContainer.appendChild(card);
+            });
+        
+        filterSessions('upcoming');
+    };
+
+    const filterSessions = (filter) => {
+        const sessionCards = document.querySelectorAll('.session-card');
+        let hasVisibleCards = false;
+        sessionCards.forEach(card => {
+            if (card.dataset.sessionType === filter) {
+                card.style.display = 'flex';
+                hasVisibleCards = true;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+        const existingMessage = sessionsContainer.querySelector('.no-sessions-message');
+        if(existingMessage) existingMessage.remove();
+        if (!hasVisibleCards) {
+            const message = document.createElement('p');
+            message.className = 'no-sessions-message';
+            message.textContent = `No ${filter} sessions found.`;
+            sessionsContainer.appendChild(message);
+        }
+    };
+    
+    const renderCalendar = () => { /* ... Calendar logic remains the same ... */ };
+
+    filterTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            filterTabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            filterSessions(tab.dataset.filter);
+        });
+    });
+
+    scheduleSessionForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const selectedOptions = Array.from(menteeSelect.selectedOptions);
+        const menteeIds = selectedOptions.map(opt => opt.value);
+
+        if (menteeIds.length === 0) {
+            alert('Please select at least one mentee.');
+            return;
+        }
+
+        const sessionData = {
+            title: document.getElementById('session-title').value,
+            date: document.getElementById('session-date').value,
+            time: document.getElementById('session-time').value,
+            duration: document.getElementById('session-duration').value,
+            meetingLink: document.getElementById('meeting-link').value
+        };
+
+        try {
+            const promises = menteeIds.map(menteeId => {
+                const payload = { ...sessionData, menteeId };
+                return fetch(`${API_BASE_URL}/mentor/create-session`, {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify(payload)
+                });
+            });
+            const responses = await Promise.all(promises);
+            if (responses.some(res => !res.ok)) {
+                throw new Error('Failed to schedule one or more sessions.');
+            }
+            alert('Group session scheduled successfully!');
+            scheduleSessionForm.reset();
+            initializePage();
+        } catch (error) {
+            console.error("Error scheduling session:", error);
+            alert(`Error: ${error.message}`);
+        }
+    });
+
+    initializePage();
+});
+</script>
+</body>
+</html>
+

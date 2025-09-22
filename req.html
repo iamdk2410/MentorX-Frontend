@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprehensive Mentor Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        :root {
+            --primary-color: #4F46E5;
+            --primary-light: #E0E7FF;
+            --primary-dark: #4338CA;
+            --secondary-color: #10B981;
+            --danger-color: #EF4444;
+            --bg-light: #F9FAFB;
+            --bg-white: #FFFFFF;
+            --text-dark: #1F2937;
+            --text-medium: #6B7280;
+            --border-color: #E5E7EB;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-light);
+            margin: 0;
+            color: var(--text-dark);
+            display: flex;
+            overflow-x: hidden;
+        }
+
+        /* --- Main Layout --- */
+        .sidebar {
+            width: 260px;
+            background-color: var(--bg-white);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            flex-shrink: 0;
+        }
+
+        .main-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .sidebar-logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary-color);
+        }
+
+        .sidebar-nav { padding: 1rem; }
+        .sidebar-nav ul { list-style: none; padding: 0; margin: 0; }
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            color: var(--text-medium);
+            font-weight: 500;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .sidebar-nav a:hover { background-color: var(--bg-light); color: var(--text-dark); }
+        .sidebar-nav a.active { background-color: var(--primary-light); color: var(--primary-color); }
+
+        .header {
+            background-color: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+            margin: 0;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.6rem 1rem;
+            border-radius: 0.5rem;
+            border: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .btn-primary { background-color: var(--primary-color); color: white; }
+        .btn-primary:hover { background-color: var(--primary-dark); }
+        .btn-primary input[type="file"] { display: none; }
+
+        .content {
+            padding: 1.5rem;
+        }
+
+        .page-section { display: none; }
+        .page-section.active { display: block; }
+
+        /* --- Cards & Widgets --- */
+        .card {
+            background-color: var(--bg-white);
+            border-radius: 0.75rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+            margin-bottom: 1.5rem;
+        }
+        .card-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 600;
+            font-size: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .card-content { padding: 1.5rem; }
+        .card-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border-color);
+            background-color: var(--bg-light);
+        }
+
+        /* --- Session Request Card --- */
+        .request-card {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .request-card img { width: 50px; height: 50px; border-radius: 50%; }
+        .request-info { flex: 1; }
+        .request-info p { margin: 0; }
+        .mentee-name { font-weight: 600; }
+        .session-topic { color: var(--text-medium); font-size: 0.9rem; }
+        .request-actions .btn { padding: 0.5rem 0.8rem; font-size: 0.9rem; }
+        .btn-accept { background-color: var(--secondary-color); color: white; }
+        .btn-decline { background-color: var(--bg-light); color: var(--text-medium); border: 1px solid var(--border-color); }
+
+        /* --- Message Page --- */
+        .message-container {
+            display: flex;
+            height: calc(100vh - 150px);
+        }
+        .conversations-list {
+            width: 300px;
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto;
+        }
+        .chat-window { flex: 1; display: flex; flex-direction: column; }
+        .chat-header { padding: 1rem; border-bottom: 1px solid var(--border-color); font-weight: 600; }
+        .chat-messages { flex: 1; padding: 1rem; overflow-y: auto; }
+        .message-input { padding: 1rem; border-top: 1px solid var(--border-color); display: flex; gap: 0.5rem; }
+        .message-input input { flex: 1; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 0.5rem; }
+        
+        /* --- Study Planner --- */
+        .session-item {
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .session-item-header { display: flex; justify-content: space-between; font-weight: 600; }
+        .session-item-body { color: var(--text-medium); padding: 0.5rem 0; }
+        
+        /* --- Notes Page --- */
+        .notes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+        .note-card { padding: 1rem; }
+        .note-card h3 { margin-top: 0; }
+        .note-card p { font-size: 0.9rem; color: var(--text-medium); }
+
+        /* --- Dashboard Specific Styles --- */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .stat-card { padding: 1.5rem; }
+        .stat-card .icon { width: 3rem; height: 3rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem; }
+        .stat-card .value { font-size: 2.25rem; font-weight: 800; }
+        .stat-card .label { color: var(--text-medium); }
+        .main-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+        .student-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 1rem; }
+        .student-list-item { display: flex; align-items: center; gap: 1rem; }
+        .student-list-item img { width: 40px; height: 40px; border-radius: 50%; }
+        .student-info { flex: 1; }
+        .student-name { font-weight: 600; }
+        .student-email { font-size: 0.875rem; color: var(--text-medium); }
+        .student-score { font-weight: 700; font-size: 1.125rem; }
+        .score-red { color: var(--danger-color); }
+        .score-green { color: var(--secondary-color); }
+        .tag { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.8rem; font-weight: 500; }
+        .tag-green { background-color: #D1FAE5; color: #065F46; }
+        .tag-red { background-color: #FEE2E2; color: #991B1B; }
+        .course-list .course-item { display: flex; align-items: center; gap: 1rem; padding: 0.75rem 0; border-bottom: 1px solid var(--border-color); }
+        .course-list .course-item:last-child { border-bottom: none; }
+        .course-icon { width: 40px; height: 40px; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; background-color: var(--primary-light); color: var(--primary-dark); }
+        .peer-pairing-grid { display: grid; grid-template-columns: 1fr auto 1fr; gap: 1.5rem; align-items: start; }
+        .peer-column .card-header { background-color: var(--bg-light); }
+        .pair-connector { display: flex; align-items: center; justify-content: center; height: 100%; padding-top: 5rem; }
+        .detailed-report-grid { display: grid; grid-template-columns: 1fr; }
+
+        @media (min-width: 1024px) {
+            .main-grid { grid-template-columns: 1fr 1fr; }
+            .detailed-report-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                position: fixed;
+                transform: translateX(-100%);
+                z-index: 100;
+                transition: transform 0.3s ease-in-out;
+            }
+            .sidebar.open { transform: translateX(0); }
+            .message-container { flex-direction: column; }
+            .conversations-list { width: 100%; height: 200px; border-right: none; border-bottom: 1px solid var(--border-color); }
+            .peer-pairing-grid { grid-template-columns: 1fr; }
+            .pair-connector { display: none; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <i data-lucide="shield"></i>
+            <h1 class="sidebar-logo">Mentor Panel</h1>
+        </div>
+        <nav class="sidebar-nav">
+            <ul>
+                <li><a data-page="requests" class="nav-link active"><i data-lucide="mail-plus"></i><span>Session Requests</span></a></li>
+                <li><a data-page="dashboard" class="nav-link"><i data-lucide="bar-chart-3"></i><span>Performance Dashboard</span></a></li>
+                <li><a data-page="messages" class="nav-link"><i data-lucide="message-square"></i><span>Messages</span></a></li>
+                <li><a data-page="planner" class="nav-link"><i data-lucide="calendar"></i><span>Study Planner</span></a></li>
+                <li><a data-page="notes" class="nav-link"><i data-lucide="folder"></i><span>Shared Notes</span></a></li>
+                <li><a data-page="settings" class="nav-link"><i data-lucide="settings"></i><span>Settings</span></a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <div class="main-container">
+        <header class="header">
+            <h1 id="page-title">Session Requests</h1>
+            <div id="header-actions-container">
+                <!-- Header actions will be dynamically inserted here -->
+            </div>
+        </header>
+
+        <main class="content">
+
+            <!-- PAGE: Session Requests -->
+            <section id="requests-page" class="page-section active">
+                <div class="card">
+                    <div class="card-header">
+                        <span>New Mentee Requests</span>
+                        <span style="font-size: 0.9rem; color: var(--text-medium)">You have 2 new requests</span>
+                    </div>
+                    <div class="card-content">
+                        <div class="request-card" style="margin-bottom: 1.5rem;">
+                            <img src="https://placehold.co/100x100/dbeafe/1e3a8a?text=AM" alt="Alex Morgan">
+                            <div class="request-info">
+                                <p class="mentee-name">Alex Morgan</p>
+                                <p class="session-topic">"Need help with Python project basics."</p>
+                            </div>
+                            <div class="header-actions request-actions">
+                                <button class="btn btn-accept">Accept</button>
+                                <button class="btn btn-decline">Decline</button>
+                            </div>
+                        </div>
+                         <div class="request-card">
+                            <img src="https://placehold.co/100x100/dcfce7/166534?text=SO" alt="Sarah Ortiz">
+                            <div class="request-info">
+                                <p class="mentee-name">Sarah Ortiz</p>
+                                <p class="session-topic">"Career guidance for a Data Scientist role."</p>
+                            </div>
+                            <div class="header-actions request-actions">
+                                <button class="btn btn-accept">Accept</button>
+                                <button class="btn btn-decline">Decline</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- PAGE: Performance Dashboard -->
+            <section id="dashboard-page" class="page-section">
+                <!-- Content is dynamically injected by JavaScript -->
+            </section>
+
+            <!-- PAGE: Messages -->
+            <section id="messages-page" class="page-section">
+                <div class="card message-container">
+                    <div class="conversations-list">
+                       <!-- Conversation items would go here -->
+                       <div style="padding: 1rem; font-weight: 500; text-align: center; color: var(--text-medium)">No conversations selected</div>
+                    </div>
+                    <div class="chat-window">
+                        <div class="chat-header">Select a Conversation</div>
+                        <div class="chat-messages"></div>
+                        <div class="message-input">
+                            <input type="text" placeholder="Type your message...">
+                            <button class="btn btn-primary"><i data-lucide="send"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PAGE: Study Planner -->
+            <section id="planner-page" class="page-section">
+                <div class="card">
+                    <div class="card-header">Upcoming Sessions</div>
+                    <div class="card-content">
+                        <div class="session-item">
+                            <div class="session-item-header">
+                                <span>Resume Review with Alex Morgan</span>
+                                <span>Aug 30, 2025 @ 10:30 AM</span>
+                            </div>
+                            <div class="session-item-body">Discussing resume improvements and career pathing for product management roles.</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PAGE: Shared Notes -->
+            <section id="notes-page" class="page-section">
+                <div class="notes-grid">
+                    <div class="card note-card">
+                        <h3>Python Cheatsheet.pdf</h3>
+                        <p>A handy guide covering Python basics and common libraries.</p>
+                        <div class="card-footer" style="padding: 0.75rem 0 0 0; margin-top: 1rem; background: none;">
+                            <button class="btn btn-primary" style="width: 100%;">Download</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- PAGE: Settings -->
+            <section id="settings-page" class="page-section">
+                 <div class="card">
+                    <div class="card-header">Settings</div>
+                    <div class="card-content">
+                        <p>Settings and profile management options will be available here.</p>
+                    </div>
+                 </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // --- Navigation Logic ---
+        const navLinks = document.querySelectorAll('.nav-link');
+        const pageSections = document.querySelectorAll('.page-section');
+        const pageTitle = document.getElementById('page-title');
+        const headerActionsContainer = document.getElementById('header-actions-container');
+
+        const headerActions = {
+            dashboard: `<button class="btn btn-primary" onclick="document.getElementById('file-upload').click()">
+                            <i data-lucide="upload"></i>
+                            <span>Upload Report</span>
+                        </button>
+                        <input type="file" id="file-upload" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />`,
+            planner: `<button class="btn btn-primary"><i data-lucide="plus-circle"></i><span>Schedule New Session</span></button>`,
+            notes: `<button class="btn btn-primary"><i data-lucide="upload-cloud"></i><span>Upload Note</span></button>`,
+            default: ''
+        };
+
+        function switchPage(pageId) {
+            // Update nav links
+            navLinks.forEach(link => {
+                link.classList.toggle('active', link.dataset.page === pageId);
+            });
+
+            // Show/hide page sections
+            pageSections.forEach(section => {
+                section.classList.toggle('active', section.id === `${pageId}-page`);
+            });
+
+            // Update title and header actions
+            const activeLink = document.querySelector(`.nav-link[data-page="${pageId}"]`);
+            if (activeLink) {
+                pageTitle.textContent = activeLink.querySelector('span').textContent;
+                headerActionsContainer.innerHTML = headerActions[pageId] || headerActions.default;
+                lucide.createIcons(); // Re-render icons in the header
+            }
+        }
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                const pageId = link.dataset.page;
+                switchPage(pageId);
+            });
+        });
+        
+        // --- Inject Performance Dashboard HTML ---
+        const dashboardHtml = `
+            <section class="stats-grid">
+                <div class="card stat-card">
+                    <div class="icon" style="background-color: #E0E7FF; color: #4F46E5;"><i data-lucide="users"></i></div>
+                    <p class="value">100</p><p class="label">Total Students</p>
+                </div>
+                <div class="card stat-card">
+                    <div class="icon" style="background-color: #D1FAE5; color: #065F46;"><i data-lucide="trending-up"></i></div>
+                    <p class="value">82%</p><p class="label">Average Score</p>
+                </div>
+                <div class="card stat-card">
+                    <div class="icon" style="background-color: #FEF3C7; color: #92400E;"><i data-lucide="award"></i></div>
+                    <p class="value">15</p><p class="label">Top Performers</p>
+                </div>
+                <div class="card stat-card">
+                    <div class="icon" style="background-color: #FEE2E2; color: #991B1B;"><i data-lucide="trending-down"></i></div>
+                    <p class="value">8</p><p class="label">Poor Performers</p>
+                </div>
+            </section>
+
+            <section class="main-grid">
+                <div class="card">
+                    <div class="card-header">Top Improvers</div>
+                    <div class="card-content">
+                        <ul class="student-list">
+                            <li class="student-list-item">
+                                <img src="https://placehold.co/80x80/dcfce7/166534?text=SO" alt="S.O.">
+                                <div class="student-info"><p class="student-name">Sarah Ortiz</p><p class="student-email">sarah.o@example.com</p></div>
+                                <p class="student-score score-green">+15%</p>
+                            </li>
+                            <li class="student-list-item">
+                                <img src="https://placehold.co/80x80/dbeafe/1e3a8a?text=DM" alt="D.M.">
+                                <div class="student-info"><p class="student-name">David Miller</p><p class="student-email">david.m@example.com</p></div>
+                                <p class="student-score score-green">+12%</p>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">Poor Performers</div>
+                    <div class="card-content">
+                        <ul class="student-list">
+                            <li class="student-list-item">
+                                <img src="https://placehold.co/80x80/fee2e2/991b1b?text=JT" alt="J.T.">
+                                <div class="student-info"><p class="student-name">John Thompson</p><p class="student-email">john.t@example.com</p></div>
+                                <p class="student-score score-red">45%</p>
+                            </li>
+                             <li class="student-list-item">
+                                <img src="https://placehold.co/80x80/ffedd5/9a3412?text=LW" alt="L.W.">
+                                <div class="student-info"><p class="student-name">Laura Wilson</p><p class="student-email">laura.w@example.com</p></div>
+                                <p class="student-score score-red">52%</p>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card">
+                <div class="card-header">
+                    <span>Detailed Report: John Thompson</span>
+                    <a href="#" style="font-size: 0.875rem; color: var(--primary-color); text-decoration: none;">View All Students</a>
+                </div>
+                <div class="detailed-report-grid">
+                    <div class="card-content">
+                        <h3 style="margin-top:0;">Performance Summary</h3>
+                        <div style="margin-bottom: 1rem;"><strong>Strengths:</strong> <span class="tag tag-green">Analytical Skills</span></div>
+                        <div><strong>Weaknesses:</strong> <span class="tag tag-red">Programming Logic</span> <span class="tag tag-red">Data Structures</span></div>
+                    </div>
+                    <div class="card-content" style="border-left: 1px solid var(--border-color);">
+                        <h3 style="margin-top:0;">Recommended To-Do Courses</h3>
+                        <div class="course-list">
+                            <div class="course-item">
+                                <div class="course-icon"><i data-lucide="code"></i></div>
+                                <div><p class="student-name" style="margin:0;">Advanced Python Logic</p><p class="student-email" style="margin:0;">Deadline: 15 Sep 2025</p></div>
+                            </div>
+                            <div class="course-item">
+                                <div class="course-icon"><i data-lucide="binary"></i></div>
+                                <div><p class="student-name" style="margin:0;">Data Structures Fundamentals</p><p class="student-email" style="margin:0;">Deadline: 30 Sep 2025</p></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="peer-pairing">
+                <h2 style="font-size: 1.25rem; margin-bottom: 1rem;">Peer Pairing for Knowledge Sharing</h2>
+                <div class="peer-pairing-grid">
+                    <div class="card peer-column"><div class="card-header">Good Performers</div><div class="card-content"><ul class="student-list"><li class="student-list-item"><img src="https://placehold.co/80x80/ecfdf5/047857?text=ER" alt="E.R."><div class="student-info"><p class="student-name">Emily Rodriguez</p></div></li></ul></div></div>
+                    <div class="pair-connector"><i data-lucide="link-2" style="color: #9CA3AF; width: 48px; height: 48px;"></i></div>
+                    <div class="card peer-column"><div class="card-header">Paired With Poor Performers</div><div class="card-content"><ul class="student-list"><li class="student-list-item"><img src="https://placehold.co/80x80/fee2e2/991b1b?text=JT" alt="J.T."><div class="student-info"><p class="student-name">John Thompson</p></div></li></ul></div></div>
+                </div>
+            </section>
+        `;
+        document.getElementById('dashboard-page').innerHTML = dashboardHtml;
+
+
+        // Initialize with the default page
+        switchPage('requests');
+    </script>
+</body>
+</html>
+

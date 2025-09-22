@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="Login.css">
+    <link rel="icon" href="MentorX_Logo_Design-removebg-preview.png">
+    <title>MentorX - Login & Sign Up</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Simple transition for the new field */
+        .input-group.hidden {
+            max-height: 0;
+            overflow: hidden;
+            padding-top: 0;
+            padding-bottom: 0;
+            margin-top: 0;
+            margin-bottom: 0;
+            opacity: 0;
+            transition: all 0.4s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <img src="MentorX_Logo_Design_1_-removebg-preview(1).png" alt="MentorX Logo" class="login-logo">
+            <h2 id="formTitle">Welcome Back!</h2>
+            <p id="formSubtitle">Please log in to your MentorX account.</p>
+
+            <form id="authForm">
+                <div class="input-group" id="nameInputGroup" style="display: none;">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" name="name" placeholder="e.g., Jane Doe">
+                    <div class="error-message" id="nameError"></div>
+                </div>
+
+                <div class="input-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" placeholder="you@example.com" required>
+                    <div class="error-message" id="emailError"></div>
+                </div>
+
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="••••••••" required>
+                    <div class="error-message" id="passwordError"></div>
+                </div>
+
+                <div class="input-group role-selection">
+                    <label id="roleLabel">Login As:</label>
+                    <div class="role-radios">
+                        <input type="radio" id="roleMentee" name="role" value="mentee" checked>
+                        <label for="roleMentee">Mentee</label>
+                        <input type="radio" id="roleMentor" name="role" value="mentor">
+                        <label for="roleMentor">Mentor</label>
+                        <input type="radio" id="roleAdmin" name="role" value="admin">
+                        <label for="roleAdmin">Admin</label>
+                    </div>
+                    <div class="error-message" id="roleError"></div>
+                </div>
+                
+                <!-- NEW: Specialized Courses Input Field -->
+                <div class="input-group hidden" id="coursesInputGroup">
+                    <label for="courses">Specialized Courses</label>
+                    <input type="text" id="courses" name="courses" placeholder="e.g., HTML, CSS, JavaScript">
+                    <div class="error-message" id="coursesError"></div>
+                </div>
+
+                <div class="options-group" id="optionsGroup">
+                    <div class="remember-me">
+                        <input type="checkbox" id="rememberMe" name="rememberMe">
+                        <label for="rememberMe">Remember me</label>
+                    </div>
+                    <a href="#" class="forgot-password">Forgot Password?</a>
+                </div>
+
+                <button type="submit" class="login-button" id="submitButton">Log In</button>
+            </form>
+
+            <p class="signup-link" id="toggleContainer">Don't have an account? <a href="#" id="toggleLink">Sign Up</a></p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- STATE ---
+            let isLoginMode = true;
+
+            // --- DOM ELEMENTS ---
+            const authForm = document.getElementById('authForm');
+            const formTitle = document.getElementById('formTitle');
+            const formSubtitle = document.getElementById('formSubtitle');
+            const nameInputGroup = document.getElementById('nameInputGroup');
+            const nameInput = document.getElementById('name');
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const roleLabel = document.getElementById('roleLabel');
+            const roleRadios = document.querySelectorAll('input[name="role"]');
+            const coursesInputGroup = document.getElementById('coursesInputGroup');
+            const coursesInput = document.getElementById('courses');
+            const optionsGroup = document.getElementById('optionsGroup');
+            const submitButton = document.getElementById('submitButton');
+            const toggleContainer = document.getElementById('toggleContainer');
+            const nameError = document.getElementById('nameError');
+            const emailError = document.getElementById('emailError');
+            const passwordError = document.getElementById('passwordError');
+            const roleError = document.getElementById('roleError');
+
+            // --- FUNCTIONS ---
+
+            // NEW: Function to show/hide the courses field based on form mode and role
+            const toggleCoursesField = () => {
+                const selectedRole = document.querySelector('input[name="role"]:checked').value;
+                if (!isLoginMode && selectedRole === 'mentor') {
+                    coursesInputGroup.classList.remove('hidden');
+                } else {
+                    coursesInputGroup.classList.add('hidden');
+                }
+            };
+
+            const setupToggleLink = () => {
+                const toggleLink = document.getElementById('toggleLink');
+                if (toggleLink) {
+                    toggleLink.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        toggleFormMode();
+                    });
+                }
+            };
+
+            const clearErrors = () => {
+                nameError.textContent = '';
+                emailError.textContent = '';
+                passwordError.textContent = '';
+                roleError.textContent = '';
+            };
+
+            const toggleFormMode = () => {
+                isLoginMode = !isLoginMode;
+                authForm.reset();
+                clearErrors();
+
+                if (isLoginMode) {
+                    // --- Configure for Login ---
+                    formTitle.textContent = 'Welcome Back!';
+                    formSubtitle.textContent = 'Please log in to your MentorX account.';
+                    nameInputGroup.style.display = 'none';
+                    nameInput.removeAttribute('required');
+                    roleLabel.textContent = 'Login As:';
+                    optionsGroup.style.display = 'flex';
+                    submitButton.textContent = 'Log In';
+                    toggleContainer.innerHTML = `Don't have an account? <a href="#" id="toggleLink">Sign Up</a>`;
+                } else {
+                    // --- Configure for Sign Up ---
+                    formTitle.textContent = 'Create Your Account';
+                    formSubtitle.textContent = 'Join MentorX as a mentor or mentee.';
+                    nameInputGroup.style.display = 'block';
+                    nameInput.setAttribute('required', 'true');
+                    roleLabel.textContent = 'Register As:';
+                    optionsGroup.style.display = 'none';
+                    submitButton.textContent = 'Sign Up';
+                    toggleContainer.innerHTML = `Already have an account? <a href="#" id="toggleLink">Log In</a>`;
+                }
+                toggleCoursesField(); // Check if courses field should be visible
+                setupToggleLink();
+            };
+
+            async function handleFormSubmit(event) {
+                event.preventDefault();
+                clearErrors();
+
+                const email = emailInput.value;
+                const password = passwordInput.value;
+                const roleInput = document.querySelector('input[name="role"]:checked');
+
+                if (!roleInput) {
+                    roleError.textContent = 'Please select a role.';
+                    return;
+                }
+                const role = roleInput.value;
+
+                if (isLoginMode) {
+                    // --- LOGIN LOGIC ---
+                    try {
+                        const response = await fetch('http://localhost:5000/api/auth/login', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ email, password, role }),
+                        });
+                        const data = await response.json();
+                        if (response.ok) {
+                            localStorage.setItem('token', data.token);
+                            localStorage.setItem('user', JSON.stringify(data.user)); // Save user object
+                            window.location.href = data.redirectUrl;
+                        } else {
+                            alert(data.msg || 'An unknown error occurred.');
+                        }
+                    } catch (error) {
+                        console.error('Login request failed:', error);
+                        alert('Could not connect to the server.');
+                    }
+                } else {
+                    // --- REGISTRATION LOGIC ---
+                    const name = nameInput.value;
+                    if (!name) {
+                        nameError.textContent = 'Please enter your full name.';
+                        return;
+                    }
+
+                    const payload = { name, email, password, role };
+                    
+                    // If registering as a mentor, get courses and add to payload
+                    if (role === 'mentor') {
+                        const coursesValue = coursesInput.value;
+                        // Convert comma-separated string to an array of trimmed strings
+                        payload.specializedCourses = coursesValue.split(',').map(course => course.trim()).filter(Boolean);
+                    }
+
+                    try {
+                        const response = await fetch('http://localhost:5000/api/auth/register', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload),
+                        });
+                        const data = await response.json();
+                        if (response.ok) {
+                            let successMessage = 'Registration successful! You can now log in.';
+                            if (role === 'mentor') {
+                                successMessage = 'Registration successful! Your account is pending admin approval.';
+                            }
+                            alert(successMessage);
+                            toggleFormMode(); // Switch to login view
+                        } else {
+                            alert(data.msg || 'Registration failed.');
+                        }
+                    } catch (error) {
+                        console.error('Registration request failed:', error);
+                        alert('Could not connect to the server.');
+                    }
+                }
+            }
+
+            // --- INITIAL SETUP ---
+            authForm.addEventListener('submit', handleFormSubmit);
+            roleRadios.forEach(radio => radio.addEventListener('change', toggleCoursesField));
+            setupToggleLink();
+        });
+    </script>
+</body>
+</html>
+

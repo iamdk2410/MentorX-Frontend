@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/mentor/mymentor.css">
+    <link rel="stylesheet" href="/mentor/layout.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>MentorX - My Mentees</title>
+</head>
+<body>
+    
+<div class="parent">
+    <div class="div1">
+        <h1>MentorX</h1>
+        <hr>
+        <nav>
+            <ul>
+                <li><a href="/mentor/Mentor.html"><i class="fa-solid fa-house"></i> Dashboard</a></li>
+                <li><a href="/mentor/mymentees.html" class="active"><i class="fa-solid fa-user-group"></i> My mentees</a></li>
+                <li><a href="/mentor/request.html"><i class="fa-solid fa-bell"></i> Requests</a></li>
+                <li><a href="/mentor/message.html"><i class="fa-solid fa-envelope"></i> Messages</a></li>
+                <li><a href="/mentor/session.html"><i class="fa-solid fa-calendar"></i> Sessions</a></li>
+                <li><a href="/mentor/settings.html"><i class="fa-solid fa-gear"></i> Settings</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <div class="div2" id="mainContent">
+        <div class="topbar">
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="menteeSearch" placeholder="Search for your mentees...">
+            </div>
+        </div>
+
+        <div class="mentorList" id="menteeListContainer">
+            <!-- Dynamic mentee cards will be loaded here -->
+            <p>Loading your mentees...</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    // This function redirects to a profile page with the mentee's unique ID
+    function viewProfile(menteeId) {
+        window.location.href = `profile.html?id=${encodeURIComponent(menteeId)}`;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = '/login.html';
+            return;
+        }
+
+        const API_BASE_URL = 'http://localhost:5000/api';
+        const headers = { 'Content-Type': 'application/json', 'x-auth-token': token };
+        
+        const menteeListContainer = document.getElementById('menteeListContainer');
+        const menteeSearchInput = document.getElementById('menteeSearch');
+
+        // --- Fetch and Render Accepted Mentees ---
+        const fetchAndRenderMentees = async () => {
+            try {
+                const response = await fetch(`${API_BASE_URL}/mentor/mentees`, { headers });
+                if (!response.ok) throw new Error('Failed to fetch mentees');
+
+                const mentees = await response.json();
+                
+                menteeListContainer.innerHTML = ''; // Clear loading message
+
+                if (mentees.length === 0) {
+                    menteeListContainer.innerHTML = '<p>You have not accepted any mentees yet.</p>';
+                    return;
+                }
+
+                mentees.forEach(mentee => {
+                    const card = document.createElement('div');
+                    card.className = 'mentorListCard';
+                    card.innerHTML = `
+                        <h3><i class="fa-solid fa-user"></i> ${mentee.name}</h3>
+                        <h4>Email</h4>
+                        <h5>${mentee.email}</h5>
+                        <br>
+                        <button class="request-btn" onclick="viewProfile('${mentee._id}')">View Profile</button>
+                    `;
+                    menteeListContainer.appendChild(card);
+                });
+
+            } catch (error) {
+                console.error('Error fetching mentees:', error);
+                menteeListContainer.innerHTML = '<p>Could not load your mentees. Please try again later.</p>';
+            }
+        };
+
+        // --- Search Bar Functionality ---
+        menteeSearchInput.addEventListener('keyup', function() {
+            const searchTerm = this.value.toLowerCase();
+            const menteeCards = document.querySelectorAll('.mentorListCard');
+
+            menteeCards.forEach(card => {
+                const cardText = card.textContent.toLowerCase();
+                if (cardText.includes(searchTerm)) {
+                    card.style.display = ""; 
+                } else {
+                    card.style.display = "none"; 
+                }
+            });
+        });
+
+        // --- Initial Load ---
+        fetchAndRenderMentees();
+    });
+</script>
+    
+</body>
+</html>

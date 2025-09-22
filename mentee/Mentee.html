@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/mentee/mentee.css">
+    <link rel="stylesheet" href="/mentee/layout.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>MentorX - Mentee Dashboard</title>
+    <style>
+        /* --- Main Dashboard Grid Layout --- */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Two equal columns */
+            gap: 1.5rem;
+            align-items: start;
+        }
+
+        .grid-column {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .dashboard-grid .card {
+            margin-bottom: 0;
+        }
+        
+        /* Responsive adjustments for the new grid */
+        @media (max-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr; /* Stack to a single column on smaller screens */
+            }
+        }
+
+        .insights-card .insights-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; }
+        .insight-item { display: flex; align-items: center; gap: 1rem; background-color: #f8fafc; padding: 1rem; border-radius: 8px; border: 1px solid #e2e8f0; }
+        .insight-item .icon { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; }
+        .insight-item .icon.top-subject { background-color: #dcfce7; color: #16a34a; }
+        .insight-item .icon.improve { background-color: #fff1f2; color: #ef4444; }
+        .insight-item .icon.prediction { background-color: #eef2ff; color: #4f46e5; }
+        .insight-item .details h4 { margin: 0 0 0.25rem 0; font-size: 0.9rem; color: #64748b; font-weight: 500; }
+        .insight-item .details p { margin: 0; font-size: 1.1rem; font-weight: 600; color: #1e293b; }
+        .insight-item .details p span { font-weight: 500; color: #475569; }
+
+        .achievements-card .badges-grid { display: flex; flex-wrap: wrap; gap: 1rem; }
+        .badge { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; width: 100px; padding: 1rem; border: 1px solid #e2e8f0; border-radius: 8px; background-color: #f8fafc; }
+        .badge .icon { font-size: 2rem; color: #4f46e5; margin-bottom: 0.5rem; }
+        .badge h4 { margin: 0; font-size: 0.9rem; font-weight: 600; }
+        .badge p { margin: 0.25rem 0 0 0; font-size: 0.8rem; color: #64748b; }
+
+        .resources-card .resource-list { list-style: none; padding: 0; margin: 0; }
+        .resource-item { display: flex; align-items: center; gap: 1rem; padding: 1rem 0; border-bottom: 1px solid #f1f5f9; }
+        .resource-item:last-child { border-bottom: none; }
+        .resource-item .icon { font-size: 1.2rem; color: #4f46e5; width: 32px; text-align: center; }
+        .resource-item .details a { text-decoration: none; color: #1e293b; font-weight: 600; }
+        .resource-item .details a:hover { color: #4f46e5; text-decoration: underline; }
+        .resource-item .details p { font-size: 0.9rem; color: #64748b; margin: 0.25rem 0 0 0; }
+
+        .chatbot-toggler { position: fixed; bottom: 30px; right: 35px; width: 60px; height: 60px; background: #4f46e5; color: #fff; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: transform 0.3s ease; }
+        .chatbot-toggler:hover { transform: scale(1.1); }
+        .chatbot-container { position: fixed; bottom: 100px; right: 35px; width: 420px; background: #fff; border-radius: 15px; box-shadow: 0 0 128px 0 rgba(0,0,0,0.1), 0 32px 64px -48px rgba(0,0,0,0.5); transform: scale(0.5); opacity: 0; pointer-events: none; transition: all 0.3s ease; transform-origin: bottom right; }
+        .show-chatbot .chatbot-container { transform: scale(1); opacity: 1; pointer-events: auto; }
+        .chatbot-header { background: #4f46e5; color: #fff; padding: 16px 20px; text-align: center; border-radius: 15px 15px 0 0; }
+        .chatbot-header h2 { font-size: 1.2rem; margin: 0; }
+        .chatbot-messages { height: 300px; overflow-y: auto; padding: 20px; }
+        .chat-message { display: flex; margin-bottom: 15px; }
+        .chat-message.outgoing { justify-content: flex-end; }
+        .chat-message p { background: #f1f5f9; color: #1e293b; padding: 12px 16px; border-radius: 18px; max-width: 80%; line-height: 1.5; margin: 0; }
+        .chat-message.outgoing p { background: #4f46e5; color: #fff; }
+        .chat-input { display: flex; gap: 5px; padding: 15px 20px; border-top: 1px solid #e2e8f0; }
+        .chat-input textarea { flex-grow: 1; padding: 10px 15px; border: 1px solid #e2e8f0; border-radius: 8px; resize: none; height: 55px; font-family: inherit; font-size: 1rem; }
+        .chat-input button { border: none; background: #4f46e5; color: #fff; font-size: 1.2rem; width: 55px; cursor: pointer; border-radius: 8px; }
+    </style>
+</head>
+<body>
+    
+<div class="parent">
+    <div class="div1">
+        <h1>MentorX</h1>
+        <hr>
+        <nav>
+            <ul>
+                <li><a href="/mentee/mentee.html" class="active"><i class="fa-solid fa-house"></i> Dashboard</a></li>
+                <li><a href="/mentee/mymentor.html"><i class="fa-solid fa-user-group"></i> My mentors</a></li>
+                <li><a href="/mentee/findaMentor.html"><i class="fa-solid fa-magnifying-glass"></i> Find a mentor</a></li>
+                <li><a href="/mentee/task.html"><i class="fa-solid fa-list-check"></i> Tasks</a></li>
+                <li><a href="/mentee/session.html"><i class="fa-solid fa-calendar"></i> Sessions</a></li>
+                <li><a href="/mentee/message.html"><i class="fa-solid fa-envelope"></i> Messages</a></li>
+                <li><a href="/mentee/settings.html"><i class="fa-solid fa-gear"></i> Settings</a></li>
+            </ul>
+        </nav>
+    </div>
+    <div class="div2">
+        <div class="topbar">
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" placeholder="Search for mentors, topics...">
+            </div>
+        </div>
+        <h1 id="welcomeMessage" style="font-size: 30px;font-weight: bold;color: #4a3aff;margin-bottom: 20px;">Welcome back!</h1>
+        <div class="learn">
+            <div class="learningstatus" id="learningCoursesList">
+                <h3>Learning Courses</h3>
+            </div>
+            <div class="dashboard-row">
+                <div class="card chart-card">
+                    <canvas id="learningChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- NEW: Dashboard Grid Layout -->
+        <div class="dashboard-grid">
+            <div class="grid-column">
+                <div class="card insights-card">
+                    <h3><i class="fa-solid fa-lightbulb" style="margin-right:8px; color:#f59e0b;"></i> Performance Insights</h3>
+                    <div id="insightsContainer">
+                        <p>Analyzing your performance...</p>
+                    </div>
+                </div>
+
+                <div class="card achievements-card">
+                    <h3><i class="fa-solid fa-award" style="margin-right:8px; color:#4f46e5;"></i> Achievements</h3>
+                    <div id="achievementsContainer">
+                        <p>Checking for new achievements...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="grid-column">
+                <div class="card resources-card">
+                     <h3><i class="fa-solid fa-book-open-reader" style="margin-right:8px; color:#10b981;"></i> Recommended Resources</h3>
+                     <div id="resourcesContainer">
+                        <p>Finding resources for your areas of improvement...</p>
+                     </div>
+                </div>
+
+                <div class="card calendar-card">
+                    <h3>
+                        <i class="fa-solid fa-calendar-days" style="margin-right:8px; color:#4a3aff;"></i>
+                        Streak Calendar
+                    </h3>
+                    <div class="streak-header" id="streakHeader"></div>
+                    <div class="streak-calendar" id="streakCalendar"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="div3">
+        <div class="cards3" id="tasksList">
+            <h3>Your Tasks</h3>
+        </div>
+    </div>
+</div>
+
+<button class="chatbot-toggler"><i class="fa-solid fa-comment-dots"></i></button>
+<div class="chatbot-container"> <div class="chatbot-header"><h2>AI Study Assistant</h2></div> <div class="chatbot-messages" id="chatbotMessages"><div class="chat-message"><p>Hello! I'm your AI Study Assistant. How can I help you learn today?</p></div></div> <div class="chat-input"><textarea id="chatInput" placeholder="Ask a question..." required></textarea><button id="sendChatBtn"><i class="fa-solid fa-paper-plane"></i></button></div> </div>
+    
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // --- (All existing dashboard JavaScript remains the same) ---
+    const token = localStorage.getItem('token');
+    if (!token) { window.location.href = '../login.html'; return; }
+    const API_BASE_URL = 'http://localhost:5000/api';
+    const headers = { 'Content-Type': 'application/json', 'x-auth-token': token };
+    const welcomeMessage = document.getElementById('welcomeMessage');
+    const tasksListContainer = document.getElementById('tasksList');
+    const learningCoursesContainer = document.getElementById('learningCoursesList');
+    const insightsContainer = document.getElementById('insightsContainer');
+    const achievementsContainer = document.getElementById('achievementsContainer');
+    const resourcesContainer = document.getElementById('resourcesContainer');
+    let learningChart = null;
+    const fetchUserProfile = async () => { try { const response = await fetch(`${API_BASE_URL}/auth`, { headers }); if (!response.ok) throw new Error('Could not fetch user profile.'); const user = await response.json(); welcomeMessage.textContent = `Welcome back, ${user.name}!`; } catch (error) { console.error('Error fetching profile:', error); welcomeMessage.textContent = 'Welcome back!'; } };
+    const fetchTasks = async () => { try { const response = await fetch(`${API_BASE_URL}/mentee/tasks`, { headers }); if (!response.ok) throw new Error('Could not fetch tasks.'); const tasks = await response.json(); tasksListContainer.innerHTML = '<h3>Your Tasks</h3>'; if (tasks.length > 0) { tasks.slice(0, 3).forEach(task => { const taskElement = document.createElement('p'); taskElement.textContent = task.title; tasksListContainer.appendChild(taskElement); }); } else { tasksListContainer.innerHTML += '<p>No tasks assigned yet.</p>'; } } catch (error) { console.error('Error fetching tasks:', error); tasksListContainer.innerHTML = '<h3>Your Tasks</h3><p>Could not load tasks.</p>'; } };
+    const fetchPerformance = async (insights) => { try { const response = await fetch(`${API_BASE_URL}/mentee/performance`, { headers }); if (!response.ok) throw new Error('Could not fetch performance data.'); const performanceData = await response.json(); renderLearningCourses(performanceData); renderPerformanceChart(performanceData, insights); } catch (error) { console.error('Error fetching performance:', error); learningCoursesContainer.innerHTML = '<h3>Learning Courses</h3><p>Could not load courses.</p>'; } };
+    const fetchPerformanceInsights = async () => { try { const response = await fetch(`${API_BASE_URL}/mentee/performance-insights`, { headers }); if (!response.ok) throw new Error('Could not fetch insights.'); const insights = await response.json(); renderInsights(insights); fetchPerformance(insights); } catch (error) { console.error('Error fetching insights:', error); insightsContainer.innerHTML = `<p>${error.message}</p>`; fetchPerformance(null); } };
+    const renderInsights = (insights) => { if (!insights || insights.message) { insightsContainer.innerHTML = `<p>${insights?.message || 'Could not load insights.'}</p>`; return; } let insightsHTML = '<div class="insights-grid">'; if(insights.topSubject.subject) { insightsHTML += `<div class="insight-item"><div class="icon top-subject"><i class="fa-solid fa-trophy"></i></div><div class="details"><h4>Top Subject</h4><p>${insights.topSubject.subject} <span>(Avg: ${insights.topSubject.average})</span></p></div></div>`; } if(insights.areaToImprove.subject) { insightsHTML += `<div class="insight-item"><div class="icon improve"><i class="fa-solid fa-arrow-trend-up"></i></div><div class="details"><h4>Area to Improve</h4><p>${insights.areaToImprove.subject} <span>(Avg: ${insights.areaToImprove.average})</span></p></div></div>`; } if(insights.prediction.nextScore) { insightsHTML += `<div class="insight-item"><div class="icon prediction"><i class="fa-solid fa-bullseye"></i></div><div class="details"><h4>Predicted Next Score</h4><p>${insights.prediction.subject}: ${insights.prediction.nextScore}</p></div></div>`; } insightsHTML += '</div>'; insightsContainer.innerHTML = insightsHTML; };
+    const renderLearningCourses = (performanceData) => { learningCoursesContainer.innerHTML = '<h3>Learning Courses</h3>'; if (performanceData.length > 0) { const courses = new Set(performanceData.map(item => item.course)); courses.forEach(course => { const courseElement = document.createElement('p'); courseElement.textContent = course; learningCoursesContainer.appendChild(courseElement); }); } else { learningCoursesContainer.innerHTML += '<p>No courses found.</p>'; } };
+    const renderPerformanceChart = (performanceData, insights) => { const ctx = document.getElementById('learningChart').getContext('2d'); const courseColors = ['#4a3aff', '#ff5722', '#00b894', '#ffc107', '#9c27b0']; const labels = [...new Set(performanceData.flatMap(p => p.scores.map(s => s.testName)))]; const datasets = performanceData.map((perfItem, index) => { const data = labels.map(label => { const scoreObj = perfItem.scores.find(s => s.testName === label); return scoreObj ? scoreObj.score : null; }); if (insights && insights.prediction && insights.prediction.subject === perfItem.course && insights.prediction.nextScore) { if (!labels.includes('Next Test (Predicted)')) { labels.push('Next Test (Predicted)'); } data.push(insights.prediction.nextScore); } return { label: perfItem.course, data: data, borderColor: courseColors[index % courseColors.length], backgroundColor: `${courseColors[index % courseColors.length]}1A`, fill: false, tension: 0.4, pointBackgroundColor: courseColors[index % courseColors.length], pointRadius: 5, borderDash: perfItem.course === insights?.prediction?.subject ? [5, 5] : [] }; }); if (learningChart) { learningChart.destroy(); } learningChart = new Chart(ctx, { type: 'line', data: { labels, datasets }, options: { responsive: true, plugins: { legend: { display: true, position: 'bottom' } }, scales: { y: { beginAtZero: true, max: 100, ticks: { stepSize: 20 } } } } }); };
+    const renderStreakCalendar = () => { const streakHeader = document.getElementById("streakHeader"); const streakCalendar = document.getElementById("streakCalendar"); const today = new Date(); const year = today.getFullYear(); const month = today.getMonth(); const monthNames = ["January","February","March","April","May","June", "July","August","September","October","November","December"]; streakHeader.textContent = monthNames[month] + " " + year; const daysInMonth = new Date(year, month + 1, 0).getDate(); const streakData = Array.from({length: daysInMonth}, () => Math.random() > 0.7 ? 1 : (Math.random() > 0.5 ? 0.5 : 0)); for (let day = 1; day <= daysInMonth; day++) { const val = streakData[day - 1]; const dayDiv = document.createElement("div"); dayDiv.classList.add("streak-day"); if (val === 1) dayDiv.classList.add("active"); else if (val === 0.5) dayDiv.classList.add("partial"); dayDiv.innerHTML = `<div>${day}</div><span>${monthNames[month].slice(0,3)}</span>`; streakCalendar.appendChild(dayDiv); } };
+    const fetchGamificationData = async () => { try { const response = await fetch(`${API_BASE_URL}/mentee/gamification`, { headers }); if (!response.ok) throw new Error('Could not load achievements.'); const data = await response.json(); renderBadges(data.badges); } catch (error) { console.error(error); achievementsContainer.innerHTML = `<p>${error.message}</p>`; } };
+    const renderBadges = (badges) => { if (!badges || badges.length === 0) { achievementsContainer.innerHTML = '<p>No badges earned yet. Keep up the great work!</p>'; return; } achievementsContainer.innerHTML = '<div class="badges-grid"></div>'; const grid = achievementsContainer.querySelector('.badges-grid'); badges.forEach(badge => { const badgeEl = document.createElement('div'); badgeEl.className = 'badge'; badgeEl.title = `${badge.description} (Earned on ${new Date(badge.dateEarned).toLocaleDateString()})`; badgeEl.innerHTML = `<div class="icon"><i class="fa-solid ${badge.icon}"></i></div><h4>${badge.name}</h4>`; grid.appendChild(badgeEl); }); };
+    const fetchRecommendations = async () => { try { const response = await fetch(`${API_BASE_URL}/mentee/recommendations`, { headers }); if (!response.ok) { const errorText = await response.text(); throw new Error(errorText || 'Could not load recommendations.'); } const data = await response.json(); renderRecommendations(data.resources); } catch (error) { console.error(error); resourcesContainer.innerHTML = `<p>Error: ${error.message}</p>`; } };
+    const renderRecommendations = (resources) => { if (!resources || resources.length === 0) { resourcesContainer.innerHTML = '<p>No specific resources to recommend right now. Keep up the great work!</p>'; return; } resourcesContainer.innerHTML = '<ul class="resource-list"></ul>'; const list = resourcesContainer.querySelector('.resource-list'); resources.forEach(resource => { let iconClass = 'fa-solid fa-book'; if (resource.type.toLowerCase().includes('video')) iconClass = 'fa-solid fa-video'; if (resource.type.toLowerCase().includes('tutorial')) iconClass = 'fa-solid fa-laptop-code'; if (resource.type.toLowerCase().includes('problem')) iconClass = 'fa-solid fa-puzzle-piece'; const li = document.createElement('li'); li.className = 'resource-item'; li.innerHTML = `<div class="icon"><i class="${iconClass}"></i></div><div class="details"><a href="${resource.url}" target="_blank" rel="noopener noreferrer">${resource.title}</a><p>${resource.type}</p></div>`; list.appendChild(li); }); };
+    const chatbotToggler = document.querySelector(".chatbot-toggler"); const chatInput = document.getElementById("chatInput"); const sendChatBtn = document.getElementById("sendChatBtn"); const chatbotMessages = document.getElementById("chatbotMessages"); chatbotToggler.addEventListener("click", () => document.body.classList.toggle("show-chatbot")); const createChatMessage = (message, className) => { const chatLi = document.createElement("li"); chatLi.classList.add("chat-message", className); chatLi.innerHTML = `<p>${message}</p>`; return chatLi; }; const handleChat = async () => { const userMessage = chatInput.value.trim(); if(!userMessage) return; chatInput.value = ""; chatbotMessages.appendChild(createChatMessage(userMessage, "outgoing")); chatbotMessages.scrollTo(0, chatbotMessages.scrollHeight); const typingIndicator = createChatMessage("Typing...", "incoming"); chatbotMessages.appendChild(typingIndicator); chatbotMessages.scrollTo(0, chatbotMessages.scrollHeight); try { const response = await fetch(`${API_BASE_URL}/mentee/chatbot-query`, { method: 'POST', headers, body: JSON.stringify({ query: userMessage }) }); if (!response.ok) throw new Error("Failed to get a response from the assistant."); const { response: aiResponse } = await response.json(); typingIndicator.querySelector("p").innerHTML = aiResponse; } catch (error) { typingIndicator.querySelector("p").textContent = "Oops! Something went wrong. Please try again."; console.error(error); } finally { chatbotMessages.scrollTo(0, chatbotMessages.scrollHeight); } }; sendChatBtn.addEventListener("click", handleChat); chatInput.addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleChat(); } });
+
+    fetchUserProfile();
+    fetchTasks();
+    fetchPerformanceInsights();
+    fetchGamificationData();
+    fetchRecommendations();
+    renderStreakCalendar();
+});
+</script>
+</body>
+</html>
+

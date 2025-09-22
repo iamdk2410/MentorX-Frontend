@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>MentorX - Admin Dashboard</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            color: #333;
+            display: flex;
+        }
+        .sidebar {
+            width: 250px;
+            background: #fff;
+            height: 100vh;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            position: fixed;
+        }
+        .sidebar h1 {
+            color: #4a3aff;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .sidebar nav ul {
+            list-style: none;
+            padding: 0;
+        }
+        .sidebar nav a {
+            display: block;
+            padding: 12px 15px;
+            color: #555;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            transition: background 0.3s, color 0.3s;
+        }
+        .sidebar nav a.active, .sidebar nav a:hover {
+            background-color: #4a3aff;
+            color: #fff;
+        }
+        .sidebar nav a i {
+            margin-right: 10px;
+        }
+        .main-content {
+            margin-left: 270px; /* sidebar width + gap */
+            padding: 30px;
+            width: calc(100% - 270px);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .header h2 {
+            margin: 0;
+            font-size: 28px;
+        }
+        .card {
+            background: #fff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+        }
+        .card h3 {
+            margin-top: 0;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        th {
+            background-color: #f9f9f9;
+        }
+        .btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        .btn-approve {
+            background-color: #28a745;
+            color: white;
+        }
+        .btn-approve:hover { background-color: #218838; }
+        .btn-reject {
+            background-color: #dc3545;
+            color: white;
+        }
+        .btn-reject:hover { background-color: #c82333; }
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #eee;
+            margin-bottom: 20px;
+        }
+        .tab-link {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 16px;
+            border-bottom: 2px solid transparent;
+        }
+        .tab-link.active {
+            font-weight: 600;
+            color: #4a3aff;
+            border-bottom-color: #4a3aff;
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .log-list { list-style: none; padding: 0; }
+        .log-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: white;
+            text-transform: capitalize;
+        }
+        .status-pending { background-color: #f59e0b; }
+        .status-accepted { background-color: #10b981; }
+        .status-rejected { background-color: #ef4444; }
+        .status-submitted { background-color: #3b82f6; }
+        .status-reviewed { background-color: #8b5cf6; }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <h1>MentorX</h1>
+    <nav>
+        <ul>
+            <li><a href="#" class="active"><i class="fa-solid fa-tachograph-digital"></i> Dashboard</a></li>
+            <li><a href="#"><i class="fa-solid fa-gear"></i> Settings</a></li>
+            <li><a href="#" id="logoutButton"><i class="fa-solid fa-sign-out-alt"></i> Logout</a></li>
+        </ul>
+    </nav>
+</div>
+
+<div class="main-content">
+    <div class="header">
+        <h2>Admin Dashboard</h2>
+        <div id="adminName"></div>
+    </div>
+
+    <!-- Mentor Approvals -->
+    <div class="card">
+        <h3><i class="fa-solid fa-user-check"></i> Pending Mentor Approvals</h3>
+        <table id="pendingMentorsTable">
+            <thead><tr><th>Name</th><th>Email</th><th>Actions</th></tr></thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <!-- User Management -->
+    <div class="card">
+        <h3><i class="fa-solid fa-users"></i> User Management</h3>
+        <div class="tabs">
+            <button class="tab-link active" onclick="openTab(event, 'Mentees')">Mentees</button>
+            <button class="tab-link" onclick="openTab(event, 'Mentors')">Mentors</button>
+        </div>
+        <div id="Mentees" class="tab-content active">
+            <table id="menteesTable">
+                <thead><tr><th>Name</th><th>Email</th><th>Joined On</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        <div id="Mentors" class="tab-content">
+            <table id="mentorsTable">
+                <thead><tr><th>Name</th><th>Email</th><th>Specialization</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- All Mentorship Requests -->
+    <div class="card">
+        <h3><i class="fa-solid fa-paper-plane"></i> All Mentorship Requests</h3>
+        <table id="allRequestsTable">
+            <thead><tr><th>Mentee</th><th>Mentor</th><th>Status</th><th>Date</th></tr></thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <!-- All Task Submissions -->
+    <div class="card">
+        <h3><i class="fa-solid fa-list-check"></i> All Task Submissions</h3>
+        <table id="allSubmissionsTable">
+            <thead><tr><th>Mentee</th><th>Task</th><th>Status</th><th>Submitted On</th></tr></thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <!-- Platform Sessions -->
+    <div class="card">
+        <h3><i class="fa-solid fa-calendar-days"></i> Platform Sessions</h3>
+        <table id="allSessionsTable">
+            <thead><tr><th>Title</th><th>Mentor</th><th>Mentee</th><th>Date & Time</th></tr></thead>
+            <tbody></tbody>
+        </table>
+    </div>
+    
+    <!-- NEW: All Platform Messages -->
+    <div class="card">
+        <h3><i class="fa-solid fa-comments"></i> All Platform Messages</h3>
+        <table id="allMessagesTable">
+            <thead><tr><th>Sender</th><th>Receiver</th><th>Message</th><th>Date</th></tr></thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <!-- NEW: All Performance Records -->
+    <div class="card">
+        <h3><i class="fa-solid fa-chart-line"></i> All Performance Records</h3>
+        <table id="allPerformanceTable">
+            <thead><tr><th>Mentee</th><th>Mentor</th><th>Course</th><th>Test</th><th>Score</th></tr></thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+
+    <!-- Activity Logs -->
+    <div class="card">
+        <h3><i class="fa-solid fa-clipboard-list"></i> Platform Activity Logs</h3>
+        <ul id="logsList" class="log-list"></ul>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const token = localStorage.getItem('token');
+    if (!token) { window.location.href = '../login.html'; return; }
+
+    const API_BASE_URL = 'http://localhost:5000/api';
+    const headers = { 'Content-Type': 'application/json', 'x-auth-token': token };
+
+    // --- DOM Element References ---
+    const adminName = document.getElementById('adminName');
+    const pendingMentorsTbody = document.querySelector('#pendingMentorsTable tbody');
+    const menteesTbody = document.querySelector('#menteesTable tbody');
+    const mentorsTbody = document.querySelector('#mentorsTable tbody');
+    const allRequestsTbody = document.querySelector('#allRequestsTable tbody');
+    const allSubmissionsTbody = document.querySelector('#allSubmissionsTable tbody');
+    const allSessionsTbody = document.querySelector('#allSessionsTable tbody');
+    const allMessagesTbody = document.querySelector('#allMessagesTable tbody');
+    const allPerformanceTbody = document.querySelector('#allPerformanceTable tbody');
+    const logsList = document.getElementById('logsList');
+    const logoutButton = document.getElementById('logoutButton');
+
+    // --- Helper Functions ---
+    const renderTable = (tbody, data, rowTemplate) => {
+        tbody.innerHTML = '';
+        if (data && data.length > 0) {
+            data.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = rowTemplate(item);
+                tbody.appendChild(tr);
+            });
+        } else {
+            const colCount = tbody.closest('table').querySelector('thead th').length || 3;
+            tbody.innerHTML = `<tr><td colspan="${colCount}">No data available.</td></tr>`;
+        }
+    };
+    
+    // Helper to flatten performance data for table rendering
+    const flattenPerformanceData = (data) => {
+        const flatData = [];
+        data.forEach(record => {
+            record.scores.forEach(score => {
+                flatData.push({
+                    mentee: record.mentee,
+                    mentor: record.mentor,
+                    course: record.course,
+                    testName: score.testName,
+                    score: score.score
+                });
+            });
+        });
+        return flatData;
+    };
+
+
+    const formatDate = (dateString) => new Date(dateString).toLocaleDateString();
+    const formatDateTime = (dateString) => new Date(dateString).toLocaleString();
+
+    // --- Data Fetching Functions ---
+    const fetchData = async (endpoint, tbody, rowTemplate, errorMessage, dataProcessor) => {
+        try {
+            const response = await fetch(`${API_BASE_URL}${endpoint}`, { headers });
+            if (!response.ok) throw new Error(errorMessage);
+            let data = await response.json();
+            if (dataProcessor) {
+                data = dataProcessor(data); // Process data if a function is provided
+            }
+            renderTable(tbody, data, rowTemplate);
+        } catch (error) {
+            console.error(`Error fetching ${endpoint}:`, error);
+            const colCount = tbody.closest('table').querySelector('thead th').length || 3;
+            tbody.innerHTML = `<tr><td colspan="${colCount}">Could not load data.</td></tr>`;
+        }
+    };
+
+    const fetchLogs = async () => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/admin/logs`, { headers });
+            const logs = await response.json();
+            logsList.innerHTML = '';
+            if (logs.length > 0) {
+                logs.slice(0, 10).forEach(log => {
+                    const li = document.createElement('li');
+                    li.textContent = `${new Date(log.timestamp).toLocaleString()}: ${log.user?.name || 'N/A'} - ${log.action} - ${log.details || ''}`;
+                    logsList.appendChild(li);
+                });
+            } else {
+                logsList.innerHTML = '<li>No recent activity.</li>';
+            }
+        } catch (error) {
+            console.error('Error fetching logs:', error);
+            logsList.innerHTML = '<li>Could not load logs.</li>';
+        }
+    };
+
+    const handleApprovalAction = async (mentorId, action) => {
+        const url = `${API_BASE_URL}/admin/${action}-mentor/${mentorId}`;
+        const method = action === 'approve' ? 'PUT' : 'DELETE';
+        try {
+            const response = await fetch(url, { method, headers });
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText || `Server responded with status: ${response.status}`);
+            }
+            const result = await response.json();
+            alert(`Mentor ${action}d successfully.`);
+            fetchAllData(); // Refresh all data on the dashboard
+        } catch (error) {
+            console.error(`Detailed error during '${action} mentor':`, error);
+            alert(`Failed to ${action} mentor. Error: ${error.message}`);
+        }
+    };
+
+    const fetchAllData = () => {
+        fetchData('/admin/pending-mentors', pendingMentorsTbody, mentor => `<td>${mentor.name}</td><td>${mentor.email}</td><td><button class="btn btn-approve" data-id="${mentor._id}">Approve</button><button class="btn btn-reject" data-id="${mentor._id}">Reject</button></td>`, 'Failed to fetch pending mentors');
+        fetchData('/admin/users?role=mentee', menteesTbody, user => `<td>${user.name}</td><td>${user.email}</td><td>${formatDate(user.createdAt)}</td>`, 'Failed to fetch mentees');
+        fetchData('/admin/users?role=mentor', mentorsTbody, user => `<td>${user.name}</td><td>${user.email}</td><td>${(user.mentorDetails?.specializedCourses || []).join(', ') || 'N/A'}</td>`, 'Failed to fetch mentors');
+        fetchData('/admin/requests', allRequestsTbody, req => `<td>${req.mentee?.name || 'N/A'}</td><td>${req.mentor?.name || 'N/A'}</td><td><span class="status-badge status-${req.status}">${req.status}</span></td><td>${formatDate(req.sent_date)}</td>`, 'Failed to fetch requests');
+        fetchData('/admin/submissions', allSubmissionsTbody, sub => `<td>${sub.mentee?.name || 'N/A'}</td><td>${sub.task?.title || 'N/A'}</td><td><span class="status-badge status-${sub.status}">${sub.status}</span></td><td>${formatDate(sub.createdAt)}</td>`, 'Failed to fetch submissions');
+        fetchData('/admin/sessions', allSessionsTbody, session => `<td>${session.title}</td><td>${session.mentor?.name || 'N/A'}</td><td>${session.mentee?.name || 'N/A'}</td><td>${formatDate(session.date)} at ${session.time}</td>`, 'Failed to fetch sessions');
+        fetchData('/admin/messages', allMessagesTbody, msg => `<td>${msg.sender?.name || 'N/A'}</td><td>${msg.receiver?.name || 'N/A'}</td><td>${msg.content}</td><td>${formatDateTime(msg.createdAt)}</td>`, 'Failed to fetch messages');
+        fetchData('/admin/performance', allPerformanceTbody, record => `<td>${record.mentee?.name || 'N/A'}</td><td>${record.mentor?.name || 'N/A'}</td><td>${record.course}</td><td>${record.testName}</td><td>${record.score}</td>`, 'Failed to fetch performance records', flattenPerformanceData);
+        fetchLogs();
+    };
+
+    const initializeAdminDashboard = async () => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/auth`, { headers });
+            if (!response.ok) throw new Error('Authentication failed');
+            const user = await response.json();
+            if (user.role !== 'admin') {
+                alert('Access Denied: You do not have administrator privileges.');
+                throw new Error('Not an admin.');
+            }
+            adminName.textContent = `Welcome, ${user.name}!`;
+            fetchAllData();
+        } catch (error) {
+            console.error('Admin initialization error:', error.message);
+            localStorage.clear();
+            window.location.href = '../login.html';
+        }
+    };
+
+    pendingMentorsTbody.addEventListener('click', (e) => {
+        const target = e.target.closest('.btn');
+        if (!target) return;
+        const mentorId = target.dataset.id;
+        if (target.classList.contains('btn-approve')) {
+            handleApprovalAction(mentorId, 'approve');
+        } else if (target.classList.contains('btn-reject')) {
+            if (confirm('Are you sure you want to reject this application?')) {
+                handleApprovalAction(mentorId, 'reject');
+            }
+        }
+    });
+
+    logoutButton.addEventListener('click', () => {
+        localStorage.clear();
+        window.location.href = '../login.html';
+    });
+    
+    initializeAdminDashboard();
+});
+
+function openTab(evt, tabName) {
+    const tabcontent = document.getElementsByClassName("tab-content");
+    for (let i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+    }
+    const tablinks = document.getElementsByClassName("tab-link");
+    for (let i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+    document.getElementById(tabName).style.display = "block";
+    evt.currentTarget.className += " active";
+}
+</script>
+
+</body>
+</html>
+

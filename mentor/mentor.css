@@ -1,0 +1,307 @@
+.parent {
+    display: grid;
+    grid-template-columns: 220px 1fr 250px;  /* sidebar | main | right section */
+    grid-template-rows: 1fr; /* single row layout */
+    gap: 16px;
+    height: 100vh; 
+}
+
+.div1 {
+    background: #fff;
+    border-right: 1px solid #eee;
+    padding: 20px;
+}
+
+.div1 h1 {
+    font-size: 22px;
+    font-weight: bold;
+    color: #4a3aff; 
+    margin-bottom: 20px;
+}
+
+.div1 ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.div1 li {
+    margin: 12px 0;
+}
+
+.div1 a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+    padding: 10px 12px;
+    display: block;
+    border-radius: 8px;
+    transition: background 0.3s;
+}
+
+.div1 a:hover {
+    background: #f4f4f4;
+}
+
+.div1 a.active {
+    background: #f0edff;
+    color: #4a3aff;
+    font-weight: 600;
+}
+
+
+.div2 {
+    background: #fafafa;
+    padding: 20px;
+}
+
+.div3 {
+    background: #fdfdfd;
+    border-left: 1px solid #eee;
+    padding: 20px;
+}
+
+
+
+.topbar {
+  width: 100%;
+  padding: 12px 20px;
+  background: #fff;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  align-items: center;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 8px 12px;
+  width: 100%;
+  max-width: 400px;
+}
+
+.search-box i {
+  color: #888;
+  margin-right: 8px;
+  font-size: 14px;
+}
+
+.search-box input {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 14px;
+  width: 100%;
+}
+
+.cards3 {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 16px;
+  padding: 20px;
+  margin-top: 20px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cards3:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.08);
+}
+
+.cards3 h3 {
+  color: #4a3aff;
+  font-size: 18px;
+  margin-bottom: 16px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cards3 h3::before {
+  content: "\f0ae"; /* FontAwesome tasks icon */
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  color: #4a3aff;
+}
+
+
+/*task card*/
+.cards3 p {
+  background: #f9f9ff;
+  border: 1px solid #e5e5f7;
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin: 10px 0;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: background 0.3s;
+}
+
+.cards3 p:hover {
+  background: #f0edff;
+}
+
+.cards3 p::before {
+  content: "\f00c"; /* check icon */
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  color: #4a3aff;
+  font-size: 14px;
+}
+
+
+
+.learningstatus {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 16px;
+  padding: 20px;
+  width: 250px;
+  margin-top: 20px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* ✅ hover only the card */
+.learningstatus:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.08);
+}
+
+.learningstatus h3 {
+  color: #4a3aff;
+  font-size: 18px;
+  margin-bottom: 16px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.learningstatus p {
+  background: #f9f9ff;
+  border: 1px solid #e5e5f7;
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin: 10px 0;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: background 0.3s;
+}
+
+/* (optional) If you want subtle hover effect on each line separately */
+.learningstatus p:hover {
+  background: #f0edff;
+}
+
+
+.learn{
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  height: 300px;
+  gap: 100px;
+  ;
+}
+
+
+
+.streak-header {
+  font-weight: 600;
+  color: #4a3aff;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.streak-calendar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px; /* reduce spacing between days */
+  font-size: 12px; /* smaller text */
+  max-width: 500px; /* shrink overall calendar width */
+  margin: 0 auto; /* center it */
+}
+
+.streak-day {
+  width: 35px;  /* smaller day box */
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background-color: #eaeaea;
+  font-weight: bold;
+}
+
+.streak-day.active {
+  background-color: #4a3aff;
+  color: white;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Graph Card (same height as Learning Courses) */
+.chart-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  flex: 1;
+  max-width: 500px;
+  height: 250px;  /* ✅ match learningstatus card height */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#learningChart {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Place graph + learning side by side */
+.learn {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 60px; /* space between */
+  margin-bottom: 40px;
+}
+
+/* ✅ Center the streak calendar below */
+.calendar-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  max-width: 600px;
+  margin: 0 auto; /* centers the calendar */
+  text-align: center;
+}

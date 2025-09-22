@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/mentor/mentor.css">
+    <link rel="stylesheet" href="/mentor/layout.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>MentorX-Mentor</title>
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #334155;
+            --heading-color: #1e293b;
+            --border-color: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .div2 { padding: 2rem; background-color: var(--bg-color); }
+        .header { margin-bottom: 2rem; }
+        .header h2 { color: var(--heading-color); font-size: 2rem; margin: 0; }
+        .header p { color: var(--text-color); font-size: 1rem; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .stat-card { background-color: var(--card-bg); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: var(--shadow); display: flex; align-items: center; gap: 1rem; }
+        .stat-card .icon { font-size: 1.5rem; padding: 0.8rem; border-radius: 50%; color: white; }
+        .stat-card .icon.mentees { background-color: #3b82f6; }
+        .stat-card .icon.requests { background-color: #f97316; }
+        .stat-card .icon.sessions { background-color: #10b981; }
+        .stat-card .icon.messages { background-color: #8b5cf6; }
+        .stat-card .info h3 { margin: 0; font-size: 1.75rem; color: var(--heading-color); }
+        .stat-card .info p { margin: 0; color: var(--text-color); }
+        .dashboard-section { background-color: var(--card-bg); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: var(--shadow); margin-bottom: 2rem; }
+        .dashboard-section h3 { margin-top: 0; margin-bottom: 1.5rem; color: var(--heading-color); border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem; }
+        .session-list, .activity-list { list-style: none; padding: 0; margin: 0; }
+        .session-item, .activity-item { display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid var(--border-color); }
+        .session-item:last-child, .activity-item:last-child { border-bottom: none; }
+        .item-details { display: flex; align-items: center; gap: 1rem; }
+        .item-details img { width: 40px; height: 40px; border-radius: 50%; }
+        .item-details p { margin: 0; }
+        .item-details .name { font-weight: 600; color: var(--heading-color); }
+        .item-details .meta { font-size: 0.9rem; color: var(--text-color); }
+        .btn { padding: 0.5rem 1rem; border: none; background-color: var(--primary-color); color: white; border-radius: 8px; cursor: pointer; font-weight: 500; text-decoration: none; transition: background-color 0.3s; }
+        .btn:hover { background-color: var(--primary-hover); }
+        .div3 { padding: 2rem; border-left: 1px solid var(--border-color); }
+        .profile-card { text-align: center; margin-bottom: 2rem; }
+        .profile-card img { width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--primary-color); margin-bottom: 0.5rem; }
+        .profile-card h4 { margin: 0.5rem 0; color: var(--heading-color); }
+        .profile-card p { margin: 0; color: var(--text-color); }
+        .quick-actions { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 2rem; }
+        .calendar { text-align: center; }
+        .calendar .month { font-weight: 600; font-size: 1.1rem; margin-bottom: 1rem; }
+        .calendar table { width: 100%; border-collapse: collapse; }
+        .calendar th, .calendar td { padding: 0.5rem; }
+        .calendar td { cursor: pointer; border-radius: 50%; }
+        .calendar td:hover { background-color: #f1f5f9; }
+        .calendar .today { background-color: var(--primary-color); color: white; }
+        .calendar .event-day { font-weight: bold; border: 2px solid var(--primary-color); }
+    </style>
+</head>
+<body>
+    
+<div class="parent">
+    <div class="div1">
+        <h1>MentorX</h1>
+        <hr>
+        <nav>
+            <ul>
+                <li><a href="/mentor/Mentor.html" class="active"><i class="fa-solid fa-house"></i> Dashboard</a></li>
+                <li><a href="/mentor/mymentees.html"><i class="fa-solid fa-user-group"></i> My mentees</a></li>
+                <li><a href="/mentor/request.html"><i class="fa-solid fa-bell"></i> Requests</a></li>
+                <li><a href="/mentor/message.html"><i class="fa-solid fa-envelope"></i> Messages</a></li>
+                <li><a href="/mentor/session.html"><i class="fa-solid fa-calendar"></i> Sessions</a></li>
+                <li><a href="/mentor/settings.html"><i class="fa-solid fa-gear"></i> Settings</a></li>
+            </ul>
+        </nav>
+    </div>
+    <div class="div2">
+        <header class="header">
+            <h2 id="welcomeHeader">Welcome back!</h2>
+            <p id="subHeader">Here's a summary of your mentorship activities.</p>
+        </header>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="icon mentees"><i class="fa-solid fa-user-group"></i></div>
+                <div class="info">
+                    <h3 id="menteeCount">0</h3>
+                    <p>Total Mentees</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="icon requests"><i class="fa-solid fa-bell"></i></div>
+                <div class="info">
+                    <h3 id="requestCount">0</h3>
+                    <p>Pending Requests</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="icon sessions"><i class="fa-solid fa-calendar-check"></i></div>
+                <div class="info">
+                    <h3 id="sessionCount">0</h3>
+                    <p>Upcoming Sessions</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="icon messages"><i class="fa-solid fa-envelope"></i></div>
+                <div class="info">
+                    <h3>N/A</h3>
+                    <p>Unread Messages</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-section">
+            <h3>Upcoming Sessions</h3>
+            <ul class="session-list" id="sessionList">
+                <p>Loading sessions...</p>
+            </ul>
+        </div>
+        
+        <div class="dashboard-section">
+            <h3>Recent Mentee Activity</h3>
+            <ul class="activity-list" id="activityList">
+                <p>Loading recent activity...</p>
+            </ul>
+        </div>
+    </div>
+    <div class="div3">
+        <div class="cards3">
+             <div class="profile-card" id="profileCard">
+                <p>Loading...</p>
+             </div>
+             
+             <div class="quick-actions dashboard-section">
+                 <h3>Quick Actions</h3>
+                 <a href="/mentor/session.html" class="btn">Schedule a Session</a>
+                 <a href="/mentor/mymentees.html" class="btn">View All Mentees</a>
+             </div>
+
+             <div class="calendar dashboard-section" id="calendarContainer">
+                 <h3>Your Schedule</h3>
+                 <!-- Calendar will be generated here -->
+             </div>
+        </div>
+    </div>
+</div>
+    
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.location.href = '/login.html';
+        return;
+    }
+
+    const API_BASE_URL = 'http://localhost:5000/api';
+    const headers = { 'Content-Type': 'application/json', 'x-auth-token': token };
+
+    // --- DOM Elements ---
+    const welcomeHeader = document.getElementById('welcomeHeader');
+    const subHeader = document.getElementById('subHeader');
+    const menteeCountEl = document.getElementById('menteeCount');
+    const requestCountEl = document.getElementById('requestCount');
+    const sessionCountEl = document.getElementById('sessionCount');
+    const sessionListEl = document.getElementById('sessionList');
+    const activityListEl = document.getElementById('activityList');
+    const profileCardEl = document.getElementById('profileCard');
+    const calendarContainer = document.getElementById('calendarContainer');
+
+    const initializeDashboard = async () => {
+        try {
+            const [mentor, mentees, requests, sessions, submissions] = await Promise.all([
+                fetch(`${API_BASE_URL}/auth`, { headers }).then(res => res.json()),
+                fetch(`${API_BASE_URL}/mentor/mentees`, { headers }).then(res => res.json()),
+                fetch(`${API_BASE_URL}/mentor/requests`, { headers }).then(res => res.json()),
+                fetch(`${API_BASE_URL}/mentor/sessions`, { headers }).then(res => res.json()),
+                fetch(`${API_BASE_URL}/mentor/submissions`, { headers }).then(res => res.json())
+            ]);
+
+            renderProfile(mentor);
+            renderStats(mentees, requests, sessions);
+            renderUpcomingSessions(sessions);
+            renderRecentActivity(submissions);
+            renderCalendar(sessions);
+
+        } catch (error) {
+            console.error("Dashboard initialization failed:", error);
+            welcomeHeader.textContent = "Could not load dashboard";
+            subHeader.textContent = "Please try logging in again.";
+        }
+    };
+
+    const renderProfile = (mentor) => {
+        welcomeHeader.textContent = `Welcome back, ${mentor.name}!`;
+        subHeader.textContent = `Here's a summary of your mentorship activities for today, ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`;
+        profileCardEl.innerHTML = `
+            <img src="https://i.pravatar.cc/100?u=${mentor.email}" alt="Mentor Profile">
+            <h4>${mentor.name}</h4>
+            <p>${mentor.email}</p>
+        `;
+    };
+
+    const renderStats = (mentees, requests, sessions) => {
+        const upcomingSessions = sessions.filter(s => new Date(s.date) >= new Date());
+        menteeCountEl.textContent = mentees.length;
+        requestCountEl.textContent = requests.length;
+        sessionCountEl.textContent = upcomingSessions.length;
+    };
+    
+    const renderUpcomingSessions = (sessions) => {
+        sessionListEl.innerHTML = '';
+        const upcomingSessions = sessions
+            .filter(s => new Date(s.date) >= new Date())
+            .sort((a, b) => new Date(a.date) - new Date(b.date))
+            .slice(0, 3); // Show top 3
+
+        if (upcomingSessions.length === 0) {
+            sessionListEl.innerHTML = '<p>No upcoming sessions scheduled.</p>';
+            return;
+        }
+
+        upcomingSessions.forEach(session => {
+            const li = document.createElement('li');
+            li.className = 'session-item';
+            const sessionDate = new Date(session.date).toLocaleDateString('en-US', { weekday: 'long' });
+            li.innerHTML = `
+                <div class="item-details">
+                    <img src="https://i.pravatar.cc/50?u=${session.mentee.email}" alt="${session.mentee.name}">
+                    <div>
+                        <p class="name">${session.title} with ${session.mentee.name}</p>
+                        <p class="meta">${sessionDate} at ${session.time}</p>
+                    </div>
+                </div>
+                <a href="${session.meetingLink}" class="btn" target="_blank">Join Call</a>
+            `;
+            sessionListEl.appendChild(li);
+        });
+    };
+
+    const renderRecentActivity = (submissions) => {
+        activityListEl.innerHTML = '';
+        if (submissions.length === 0) {
+            activityListEl.innerHTML = '<p>No recent mentee activity.</p>';
+            return;
+        }
+        submissions.forEach(sub => {
+            const li = document.createElement('li');
+            li.className = 'activity-item';
+            li.innerHTML = `
+                <div class="item-details">
+                    <img src="https://i.pravatar.cc/50?u=${sub.mentee.email}" alt="${sub.mentee.name}">
+                    <div>
+                        <p class="name">${sub.mentee.name} submitted a task</p>
+                        <p class="meta">Task: ${sub.task.title} - ${new Date(sub.createdAt).toLocaleDateString()}</p>
+                    </div>
+                </div>
+                <a href="/mentor/profile.html?id=${sub.mentee._id}#review-tasks" class="btn">Review</a>
+            `;
+            activityListEl.appendChild(li);
+        });
+    };
+    
+    const renderCalendar = (sessions) => {
+        const today = new Date();
+        const month = today.getMonth();
+        const year = today.getFullYear();
+        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+        const eventDates = new Set(sessions.map(s => new Date(s.date).getDate()));
+
+        let table = `
+            <div class="month">${monthNames[month]} ${year}</div>
+            <table>
+                <thead><tr><th>Su</th><th>Mo</th><th>Tu</th><th>We</th><th>Th</th><th>Fr</th><th>Sa</th></tr></thead>
+                <tbody><tr>`;
+        
+        let date = 1;
+        for (let i = 0; i < 6; i++) {
+            table += '<tr>';
+            for (let j = 0; j < 7; j++) {
+                if (i === 0 && j < firstDay) {
+                    table += '<td></td>';
+                } else if (date > daysInMonth) {
+                    break;
+                } else {
+                    let className = '';
+                    if (date === today.getDate() && year === today.getFullYear() && month === today.getMonth()) className += ' today';
+                    if (eventDates.has(date)) className += ' event-day';
+                    table += `<td class="${className.trim()}">${date}</td>`;
+                    date++;
+                }
+            }
+            table += '</tr>';
+            if (date > daysInMonth) break;
+        }
+        table += '</tbody></table>';
+        calendarContainer.innerHTML = table;
+    };
+
+    initializeDashboard();
+});
+</script>
+</body>
+</html>

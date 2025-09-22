@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mentee Profile</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --secondary-color: #10b981;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --info-color: #3b82f6;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #334155;
+            --heading-color: #1e293b;
+            --border-color: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; }
+        .navbar { background-color: var(--card-bg); padding: 0 40px; border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 1000; box-shadow: var(--shadow); display: flex; justify-content: space-between; align-items: center; }
+        .navbar .nav-links { list-style: none; margin: 0; padding: 0; display: flex; }
+        .navbar .nav-links a { display: block; padding: 20px 16px; text-decoration: none; color: var(--text-color); font-weight: 600; font-size: 15px; transition: color 0.3s, border-bottom 0.3s; border-bottom: 3px solid transparent; }
+        .navbar .nav-links a:hover { color: var(--primary-color); }
+        .navbar .nav-links a.active { color: var(--primary-color); border-bottom: 3px solid var(--primary-color); }
+        .back-btn { text-decoration: none; padding: 8px 16px; background-color: var(--primary-color); color: white; border-radius: 8px; font-weight: 500; transition: background-color 0.3s ease; }
+        .back-btn:hover { background-color: var(--primary-hover); }
+        .page-container { max-width: 1200px; margin: 0 auto; padding: 30px 40px; }
+        .profile-section { background-color: var(--card-bg); border: 1px solid var(--border-color); padding: 30px; border-radius: 12px; margin-bottom: 25px; box-shadow: var(--shadow); }
+        .section-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
+        h1, h2, h3 { color: var(--heading-color); margin-top: 0; }
+        h1 { font-size: 2.25rem; margin-bottom: 5px; padding-bottom: 10px; }
+        h2 { border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 20px;}
+        h3 { margin-bottom: 15px; }
+        .mentee-status { font-size: 1.1rem; color: var(--secondary-color); font-weight: 600; }
+        .details-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+        .details-grid p { margin: 0; line-height: 1.6; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; transition: border-color 0.3s, box-shadow 0.3s; }
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2); }
+        .btn { padding: 12px 20px; border: none; background-color: var(--primary-color); color: white; border-radius: 8px; cursor: pointer; font-weight: 600; transition: background-color 0.3s; }
+        .btn:hover { background-color: var(--primary-hover); }
+        .btn-success { background-color: var(--success-color); }
+        .btn-success:hover { background-color: #059669; }
+        .btn-info { background-color: var(--info-color); }
+        .btn-info:hover { background-color: #2563eb; }
+        .results-table { width: 100%; border-collapse: collapse; }
+        .results-table th, .results-table td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border-color); }
+        .results-table th { background-color: #f9fafb; }
+        .submitted-task-item { border: 1px solid var(--border-color); border-radius: 8px; padding: 1.5rem; background-color: #f8fafc; margin-bottom: 1.5rem; }
+        .task-review-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .task-review-header h4 { margin: 0; font-size: 1.2rem; }
+        .task-review-header span { font-size: 0.9rem; color: var(--text-color); }
+        .submitted-links a { display: inline-block; margin-right: 1.5rem; color: var(--primary-color); text-decoration: none; font-weight: 500; }
+        .submitted-links a:hover { text-decoration: underline; }
+        .submitted-links i { margin-right: 0.5rem; }
+        .review-form-actions { display: flex; gap: 1rem; align-items: center; }
+        
+        .wellness-card .status { display: flex; align-items: center; gap: 1rem; }
+        .wellness-card .status-icon { font-size: 2rem; }
+        .wellness-card .status-text h4 { margin: 0; font-size: 1.2rem; }
+        .wellness-card .status-text p { margin: 0.25rem 0 0 0; color: var(--text-color); }
+        .wellness-card .status-positive { color: #16a34a; }
+        .wellness-card .status-neutral { color: #64748b; }
+        .wellness-card .status-negative { color: #ef4444; }
+
+        @media (max-width: 900px) { .section-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <ul class="nav-links">
+            <li><a href="#details">Details</a></li>
+            <li><a href="#wellness">Wellness</a></li>
+            <li><a href="#tasks">Assign Task</a></li>
+            <li><a href="#review-tasks">Review Tasks</a></li>
+            <li><a href="#results">Results</a></li>
+        </ul>
+        <a href="mymentees.html" class="back-btn">⬅ Back to List</a>
+    </nav>
+
+    <div class="page-container">
+        
+        <section id="details" class="profile-section">
+            <h1 id="menteeName">Loading...</h1>
+            <p class="mentee-status">Active Mentee</p>
+            <div class="details-grid" style="margin-top: 20px;">
+                <p><strong>Email:</strong> <span id="menteeEmail">...</span></p>
+                <p><strong>Start Date:</strong> <span id="menteeStartDate">...</span></p>
+            </div>
+        </section>
+
+        <section id="wellness" class="profile-section wellness-card">
+            <h2><i class="fa-solid fa-heart-pulse"></i> Mentee Wellness</h2>
+            <div id="sentimentStatus" class="status">
+                 <p>Click the button to analyze recent message sentiment.</p>
+            </div>
+            <div style="margin-top: 1.5rem;">
+                <button id="analyzeSentimentBtn" class="btn btn-info"><i class="fa-solid fa-magnifying-glass-chart"></i> Analyze Recent Messages</button>
+            </div>
+        </section>
+
+        <section id="tasks" class="profile-section">
+            <h2>Assign a New Task</h2>
+            <form id="assignTaskForm">
+                <div class="form-group">
+                    <label for="task-title">Task Title</label>
+                    <input type="text" id="task-title" placeholder="e.g., Build a REST API" required>
+                </div>
+                <div class="form-group">
+                    <label for="task-description">Description</label>
+                    <textarea id="task-description" rows="4" placeholder="Provide detailed instructions..." required></textarea>
+                </div>
+                <button type="submit" class="btn">Assign Task</button>
+            </form>
+        </section>
+        
+        <section id="review-tasks" class="profile-section">
+            <h2>Review Submitted Tasks</h2>
+            <div id="reviewTasksContainer">
+                <p>Loading submitted tasks...</p>
+            </div>
+        </section>
+
+        <section id="results" class="profile-section">
+            <h2>Test Results</h2>
+            <table class="results-table">
+                <thead>
+                    <tr>
+                        <th>Test Name</th>
+                        <th>Date Taken</th>
+                        <th>Score</th>
+                    </tr>
+                </thead>
+                <tbody id="resultsTbody"></tbody>
+            </table>
+            <div style="margin-top: 25px;">
+                <h3>Add New Test Result</h3>
+                <form id="addResultForm" class="section-grid">
+                    <div class="form-group">
+                        <label for="test-name">Test Name</label>
+                        <input type="text" id="test-name" required>
+                    </div>
+                     <div class="form-group">
+                        <label for="test-score">Score</label>
+                        <input type="number" id="test-score" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="test-course">Course</label>
+                        <input type="text" id="test-course" placeholder="e.g., Advanced Web Development" required>
+                    </div>
+                    <button type="submit" class="btn" style="align-self: end;">Add Result</button>
+                </form>
+            </div>
+        </section>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const token = localStorage.getItem('token');
+    if (!token) { window.location.href = '/login.html'; return; }
+
+    const API_BASE_URL = 'http://localhost:5000/api';
+    const headers = { 'Content-Type': 'application/json', 'x-auth-token': token };
+    
+    const urlParams = new URLSearchParams(window.location.search);
+    const menteeId = urlParams.get('id');
+    if (!menteeId) { alert('No mentee ID provided.'); window.location.href = 'mymentees.html'; return; }
+
+    const menteeNameEl = document.getElementById('menteeName');
+    const menteeEmailEl = document.getElementById('menteeEmail');
+    const menteeStartDateEl = document.getElementById('menteeStartDate');
+    const reviewTasksContainer = document.getElementById('reviewTasksContainer');
+    const resultsTbody = document.getElementById('resultsTbody');
+    const assignTaskForm = document.getElementById('assignTaskForm');
+    const addResultForm = document.getElementById('addResultForm');
+    const sentimentStatus = document.getElementById('sentimentStatus');
+    const analyzeSentimentBtn = document.getElementById('analyzeSentimentBtn');
+
+    const fetchMenteeDetails = async () => {
+        const response = await fetch(`${API_BASE_URL}/mentor/mentees`, { headers });
+        if (!response.ok) throw new Error('Could not fetch mentee details.');
+        const mentees = await response.json();
+        const mentee = mentees.find(m => m._id === menteeId);
+        if (mentee) {
+            menteeNameEl.textContent = mentee.name;
+            menteeEmailEl.textContent = mentee.email;
+            menteeStartDateEl.textContent = new Date(mentee.createdAt).toLocaleDateString();
+            document.title = `Mentee Profile | ${mentee.name}`;
+        } else {
+             throw new Error('Mentee not found in your list.');
+        }
+    };
+
+    const fetchSubmittedTasks = async () => {
+        const response = await fetch(`${API_BASE_URL}/mentor/submissions/${menteeId}`, { headers });
+        if (!response.ok) throw new Error('Could not fetch task submissions.');
+        const submissions = await response.json();
+        reviewTasksContainer.innerHTML = '';
+        if (submissions.length === 0) {
+            reviewTasksContainer.innerHTML = '<p>No tasks submitted for review.</p>';
+            return;
+        }
+        submissions.forEach(sub => {
+            const item = document.createElement('div');
+            item.className = 'submitted-task-item';
+            item.innerHTML = `
+                <div class="task-review-header"><h4>${sub.task.title}</h4><span>Submitted: ${new Date(sub.createdAt).toLocaleDateString()}</span></div>
+                <div class="form-group submitted-links">
+                    <a href="${sub.githubLink}" target="_blank"><i class="fa-brands fa-github"></i> View GitHub Repo</a>
+                    ${sub.file ? `<a href="${API_BASE_URL.replace('/api', '')}/${sub.file}" target="_blank"><i class="fa-solid fa-file-arrow-down"></i> View Uploaded File</a>` : ''}
+                </div>
+                <form class="review-form" data-submission-id="${sub._id}">
+                    <div class="form-group"><label>Your Feedback</label><textarea rows="4" placeholder="Provide constructive feedback..." required></textarea></div>
+                    <div class="form-group"><label>Score (e.g., 95)</label><input type="number" placeholder="95" min="0" max="100"></div>
+                    <div class="review-form-actions"><button type="submit" class="btn btn-success"><i class="fa-solid fa-check-circle"></i> Mark as Completed</button></div>
+                </form>`;
+            reviewTasksContainer.appendChild(item);
+        });
+    };
+
+    const fetchPerformanceResults = async () => {
+        const response = await fetch(`${API_BASE_URL}/mentor/performance/${menteeId}`, { headers });
+        if (!response.ok) throw new Error('Could not fetch performance results.');
+        const performanceRecords = await response.json();
+        resultsTbody.innerHTML = '';
+        if (performanceRecords.length === 0) {
+            resultsTbody.innerHTML = '<tr><td colspan="3">No test results found.</td></tr>';
+            return;
+        }
+        performanceRecords.forEach(record => {
+            record.scores.forEach(score => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${score.testName}</td><td>${new Date(score.date).toLocaleDateString()}</td><td>${score.score}</td>`;
+                resultsTbody.appendChild(tr);
+            });
+        });
+    };
+
+     const fetchAllData = async () => {
+        try {
+            await Promise.all([
+                fetchMenteeDetails(),
+                fetchSubmittedTasks(),
+                fetchPerformanceResults()
+            ]);
+        } catch (error) {
+            console.error("Failed to load page data:", error);
+            alert("Could not load mentee profile. " + error.message);
+        }
+    };
+
+    assignTaskForm.addEventListener('submit', async (e) => { e.preventDefault(); const title = document.getElementById('task-title').value; const description = document.getElementById('task-description').value; try { const response = await fetch(`${API_BASE_URL}/mentor/create-task`, { method: 'POST', headers, body: JSON.stringify({ menteeId, title, description }) }); if (!response.ok) throw new Error('Failed to assign task.'); alert('Task assigned successfully!'); assignTaskForm.reset(); } catch (error) { alert('Error: ' + error.message); } });
+    reviewTasksContainer.addEventListener('submit', async (e) => { e.preventDefault(); if (!e.target.classList.contains('review-form')) return; const form = e.target; const submissionId = form.dataset.submissionId; const feedback = form.querySelector('textarea').value; const score = form.querySelector('input[type="number"]').value; try { const response = await fetch(`${API_BASE_URL}/mentor/review-task/${submissionId}`, { method: 'POST', headers, body: JSON.stringify({ feedback, score: parseInt(score, 10) }) }); if (!response.ok) throw new Error('Failed to submit review.'); alert('Review submitted successfully!'); fetchSubmittedTasks(); } catch (error) { alert('Error: ' + error.message); } });
+    addResultForm.addEventListener('submit', async (e) => { e.preventDefault(); const testName = document.getElementById('test-name').value; const score = document.getElementById('test-score').value; const course = document.getElementById('test-course').value; try { const response = await fetch(`${API_BASE_URL}/mentor/update-performance`, { method: 'POST', headers, body: JSON.stringify({ menteeId, course, scores: [{ testName, score: parseInt(score, 10) }] }) }); if (!response.ok) throw new Error('Failed to add result.'); alert('Test result added successfully!'); addResultForm.reset(); fetchPerformanceResults(); } catch (error) { alert('Error: ' + error.message); } });
+
+    analyzeSentimentBtn.addEventListener('click', async () => {
+        analyzeSentimentBtn.disabled = true;
+        analyzeSentimentBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Analyzing...';
+        sentimentStatus.innerHTML = '<p>Please wait while we analyze recent messages...</p>';
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/mentor/sentiment/${menteeId}`, { method: 'POST', headers });
+            if (!response.ok) throw new Error('Sentiment analysis failed.');
+            const result = await response.json();
+            
+            let icon = 'fa-solid fa-face-smile';
+            let colorClass = 'status-positive';
+            if (result.sentiment === 'neutral') {
+                icon = 'fa-solid fa-face-meh';
+                colorClass = 'status-neutral';
+            } else if (result.sentiment === 'negative') {
+                icon = 'fa-solid fa-face-frown';
+                colorClass = 'status-negative';
+            }
+
+            sentimentStatus.innerHTML = `
+                <div class="status-icon ${colorClass}">
+                    <i class="${icon}"></i>
+                </div>
+                <div class="status-text">
+                    <h4>Overall Sentiment: ${result.sentiment.charAt(0).toUpperCase() + result.sentiment.slice(1)}</h4>
+                    <p>${result.summary}</p>
+                </div>
+            `;
+        } catch (error) {
+            sentimentStatus.innerHTML = `<p class="status-negative">Error: ${error.message}</p>`;
+        } finally {
+            analyzeSentimentBtn.disabled = false;
+            analyzeSentimentBtn.innerHTML = '<i class="fa-solid fa-magnifying-glass-chart"></i> Analyze Recent Messages';
+        }
+    });
+
+    fetchAllData();
+});
+</script>
+</body>
+</html>
+

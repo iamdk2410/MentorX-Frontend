@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session Details</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #334155;
+            --heading-color: #1e293b;
+            --border-color: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; }
+        .navbar { background-color: var(--card-bg); padding: 1rem 2.5rem; border-bottom: 1px solid var(--border-color); box-shadow: var(--shadow); display: flex; justify-content: space-between; align-items: center; }
+        .navbar h2 { margin: 0; font-size: 1.5rem; color: var(--heading-color); }
+        .back-btn { text-decoration: none; padding: 0.5rem 1rem; background-color: var(--primary-color); color: white; border-radius: 8px; font-weight: 500; transition: background-color 0.3s ease; }
+        .back-btn:hover { background-color: var(--primary-hover); }
+        .page-container { max-width: 900px; margin: 0 auto; padding: 2rem; }
+        .card { background-color: var(--card-bg); border: 1px solid var(--border-color); padding: 2rem; border-radius: 12px; box-shadow: var(--shadow); margin-bottom: 1.5rem; }
+        h1, h2, h3 { color: var(--heading-color); margin-top: 0; }
+        h1 { font-size: 2rem; }
+        .session-meta { display: flex; align-items: center; gap: 1.5rem; color: var(--text-color); margin: 0.5rem 0 1.5rem 0; }
+        .session-meta span { display: flex; align-items: center; gap: 0.5rem; }
+        textarea { width: 100%; min-height: 150px; padding: 1rem; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; font-family: inherit; font-size: 1rem; }
+        .btn { padding: 0.75rem 1.25rem; border: none; background-color: var(--primary-color); color: white; border-radius: 8px; cursor: pointer; font-weight: 600; transition: background-color 0.3s; display: inline-flex; align-items: center; gap: 0.5rem; }
+        .btn:hover { background-color: var(--primary-hover); }
+        .btn:disabled { background-color: #9ca3af; cursor: not-allowed; }
+        .actions { margin-top: 1rem; display: flex; justify-content: space-between; align-items: center; }
+        #aiSummarySection { margin-top: 2rem; }
+        #aiSummarySection h3 { border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem; }
+        #aiSummaryContent ul { padding-left: 1.25rem; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <h2>Session Details</h2>
+        <a href="session.html" class="back-btn">⬅ Back to Sessions</a>
+    </nav>
+
+    <div class="page-container" id="pageContainer">
+        <p>Loading session details...</p>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const token = localStorage.getItem('token');
+    if (!token) { window.location.href = '/login.html'; return; }
+
+    const API_BASE_URL = 'http://localhost:5000/api';
+    const headers = { 'Content-Type': 'application/json', 'x-auth-token': token };
+    
+    const urlParams = new URLSearchParams(window.location.search);
+    const sessionId = urlParams.get('id');
+    if (!sessionId) {
+        alert('No session ID provided.');
+        window.location.href = 'session.html';
+        return;
+    }
+    
+    const pageContainer = document.getElementById('pageContainer');
+
+    const fetchAndRenderSession = async () => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/mentor/session/${sessionId}`, { headers });
+            if (!response.ok) throw new Error('Could not fetch session details.');
+            const session = await response.json();
+            
+            document.title = `Session | ${session.title}`;
+
+            pageContainer.innerHTML = `
+                <div class="card">
+                    <h1>${session.title}</h1>
+                    <div class="session-meta">
+                        <span><i class="fa-solid fa-user"></i> With <strong>${session.mentee.name}</strong></span>
+                        <span><i class="fa-solid fa-calendar"></i> ${new Date(session.date).toLocaleDateString()}</span>
+                        <span><i class="fa-solid fa-clock"></i> ${session.time}</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3><i class="fa-solid fa-pencil"></i> Session Notes</h3>
+                    <p>Add your notes or a transcript of the session below. The AI will use this to generate a summary.</p>
+                    <textarea id="sessionNotes" placeholder="Enter session notes here...">${session.notes || ''}</textarea>
+                    <div class="actions">
+                        <button id="saveNotesBtn" class="btn">Save Notes</button>
+                        <button id="generateSummaryBtn" class="btn"><i class="fa-solid fa-wand-magic-sparkles"></i> Generate AI Summary</button>
+                    </div>
+                </div>
+
+                <div class="card" id="aiSummarySection" style="display: ${session.summary ? 'block' : 'none'};">
+                    <h3><i class="fa-solid fa-robot"></i> AI-Generated Summary</h3>
+                    <div id="aiSummaryContent">
+                        <h4>Summary</h4>
+                        <p>${session.summary || ''}</p>
+                        <h4>Action Items</h4>
+                        <ul>
+                            ${(session.actionItems || []).map(item => `<li>${item}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+            `;
+            
+            // Add event listeners after rendering the content
+            addEventListeners();
+
+        } catch (error) {
+            console.error(error.message);
+            pageContainer.innerHTML = `<p>Error: ${error.message}</p>`;
+        }
+    };
+
+    const addEventListeners = () => {
+        const saveNotesBtn = document.getElementById('saveNotesBtn');
+        const generateSummaryBtn = document.getElementById('generateSummaryBtn');
+        const sessionNotes = document.getElementById('sessionNotes');
+        
+        saveNotesBtn.addEventListener('click', async () => {
+            saveNotesBtn.textContent = 'Saving...';
+            saveNotesBtn.disabled = true;
+            try {
+                const response = await fetch(`${API_BASE_URL}/mentor/session/${sessionId}/notes`, {
+                    method: 'PUT',
+                    headers,
+                    body: JSON.stringify({ notes: sessionNotes.value })
+                });
+                if (!response.ok) throw new Error('Failed to save notes.');
+                alert('Notes saved successfully!');
+            } catch (error) {
+                alert(`Error: ${error.message}`);
+            } finally {
+                saveNotesBtn.textContent = 'Save Notes';
+                saveNotesBtn.disabled = false;
+            }
+        });
+
+        generateSummaryBtn.addEventListener('click', async () => {
+            if (!sessionNotes.value.trim()) {
+                alert('Please add some notes before generating a summary.');
+                return;
+            }
+            generateSummaryBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generating...';
+            generateSummaryBtn.disabled = true;
+            try {
+                const response = await fetch(`${API_BASE_URL}/mentor/session/${sessionId}/summarize`, {
+                    method: 'POST',
+                    headers
+                });
+                if (!response.ok) throw new Error('Failed to generate summary.');
+                
+                // Re-fetch the whole page to show the new summary
+                fetchAndRenderSession();
+
+            } catch (error) {
+                alert(`Error: ${error.message}`);
+            } finally {
+                generateSummaryBtn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Generate AI Summary';
+                generateSummaryBtn.disabled = false;
+            }
+        });
+    };
+
+    fetchAndRenderSession();
+});
+</script>
+</body>
+</html>
