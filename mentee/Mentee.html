@@ -162,7 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- (All existing dashboard JavaScript remains the same) ---
     const token = localStorage.getItem('token');
     if (!token) { window.location.href = '../login.html'; return; }
-    const API_BASE_URL = 'http://localhost:5000/api';
+    const API_BASE_URL = 'https://api-mentorx.onrender.com/api';
     const headers = { 'Content-Type': 'application/json', 'x-auth-token': token };
     const welcomeMessage = document.getElementById('welcomeMessage');
     const tasksListContainer = document.getElementById('tasksList');
