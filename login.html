@@ -24,7 +24,7 @@
 <body>
     <div class="login-container">
         <div class="login-card">
-            <img src="MentorX_Logo_Design_1_-removebg-preview(1).png" alt="MentorX Logo" class="login-logo">
+            <img src="" alt="MentorX" class="login-logo">
             <h2 id="formTitle">Welcome Back!</h2>
             <p id="formSubtitle">Please log in to your MentorX account.</p>
 
@@ -60,7 +60,6 @@
                     <div class="error-message" id="roleError"></div>
                 </div>
                 
-                <!-- NEW: Specialized Courses Input Field -->
                 <div class="input-group hidden" id="coursesInputGroup">
                     <label for="courses">Specialized Courses</label>
                     <input type="text" id="courses" name="courses" placeholder="e.g., HTML, CSS, JavaScript">
@@ -109,7 +108,6 @@
 
             // --- FUNCTIONS ---
 
-            // NEW: Function to show/hide the courses field based on form mode and role
             const toggleCoursesField = () => {
                 const selectedRole = document.querySelector('input[name="role"]:checked').value;
                 if (!isLoginMode && selectedRole === 'mentor') {
@@ -192,7 +190,13 @@
                         if (response.ok) {
                             localStorage.setItem('token', data.token);
                             localStorage.setItem('user', JSON.stringify(data.user)); // Save user object
-                            window.location.href = data.redirectUrl;
+                            
+                            // **MODIFICATION HERE**
+                            // Extract just the filename from the URL provided by the server
+                            const fullPath = data.redirectUrl; // e.g., "/mentee/mentee.html"
+                            const fileName = fullPath.split('/').pop(); // "mentee.html"
+                            window.location.href = fileName; // Redirect to the filename only
+
                         } else {
                             alert(data.msg || 'An unknown error occurred.');
                         }
@@ -210,10 +214,8 @@
 
                     const payload = { name, email, password, role };
                     
-                    // If registering as a mentor, get courses and add to payload
                     if (role === 'mentor') {
                         const coursesValue = coursesInput.value;
-                        // Convert comma-separated string to an array of trimmed strings
                         payload.specializedCourses = coursesValue.split(',').map(course => course.trim()).filter(Boolean);
                     }
 
@@ -249,4 +251,3 @@
     </script>
 </body>
 </html>
-
