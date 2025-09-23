@@ -21,7 +21,7 @@
 <body>
     <div class="login-container">
         <div class="login-card">
-            <img src="" alt="MentorX Logo" class="login-logo">
+            <img src="MentorX_Logo_Design_1_-removebg-preview(1).png" alt="MentorX Logo" class="login-logo">
             <h2 id="formTitle">Welcome Back!</h2>
             <p id="formSubtitle">Please log in to your MentorX account.</p>
             <form id="authForm">
@@ -78,9 +78,12 @@
             // DOM Elements
             const authForm = document.getElementById('authForm');
             const formTitle = document.getElementById('formTitle');
+            const formSubtitle = document.getElementById('formSubtitle');
             const nameInputGroup = document.getElementById('nameInputGroup');
+            const nameInput = document.getElementById('name');
             const emailInput = document.getElementById('email');
             const passwordInput = document.getElementById('password');
+            const roleLabel = document.getElementById('roleLabel');
             const roleRadios = document.querySelectorAll('input[name="role"]');
             const coursesInputGroup = document.getElementById('coursesInputGroup');
             const courseSelect = document.getElementById('course-select');
@@ -89,47 +92,33 @@
             const optionsGroup = document.getElementById('optionsGroup');
             const submitButton = document.getElementById('submitButton');
             const toggleContainer = document.getElementById('toggleContainer');
+            const nameError = document.getElementById('nameError');
             
+            // --- Functions ---
             const populateCourseDropdown = () => { courseSelect.innerHTML = ''; availableCourses.forEach(c => { const o = document.createElement('option'); o.value = c; o.textContent = c; courseSelect.appendChild(o); }); };
             const renderSelectedCourses = () => { selectedCoursesContainer.innerHTML = ''; selectedCourses.forEach(c => { const p = document.createElement('span'); p.className = 'course-pill'; p.textContent = c; const r = document.createElement('span'); r.className = 'remove-course-btn'; r.textContent = '×'; r.dataset.course = c; p.appendChild(r); selectedCoursesContainer.appendChild(p); }); };
             const toggleCoursesField = () => { const role = document.querySelector('input[name="role"]:checked').value; if (!isLoginMode && role === 'mentor') { coursesInputGroup.classList.remove('hidden'); } else { coursesInputGroup.classList.add('hidden'); } };
             const setupToggleLink = () => { const link = document.getElementById('toggleLink'); if (link) { link.addEventListener('click', (e) => { e.preventDefault(); toggleFormMode(); }); } };
-            const toggleFormMode = () => { isLoginMode = !isLoginMode; authForm.reset(); selectedCourses.clear(); renderSelectedCourses(); if(isLoginMode){ formTitle.textContent = 'Welcome Back!'; nameInputGroup.classList.add('hidden'); optionsGroup.style.display = 'flex'; submitButton.textContent = 'Log In'; toggleContainer.innerHTML = `Don't have an account? <a href="#" id="toggleLink">Sign Up</a>`;} else { formTitle.textContent = 'Create Your Account'; nameInputGroup.classList.remove('hidden'); optionsGroup.style.display = 'none'; submitButton.textContent = 'Sign Up'; toggleContainer.innerHTML = `Already have an account? <a href="#" id="toggleLink">Log In</a>`; } toggleCoursesField(); setupToggleLink(); };
-
+            const toggleFormMode = () => { isLoginMode = !isLoginMode; authForm.reset(); selectedCourses.clear(); renderSelectedCourses(); if(isLoginMode){ formTitle.textContent = 'Welcome Back!'; formSubtitle.textContent = 'Please log in to your MentorX account.'; nameInputGroup.classList.add('hidden'); optionsGroup.style.display = 'flex'; submitButton.textContent = 'Log In'; toggleContainer.innerHTML = `Don't have an account? <a href="#" id="toggleLink">Sign Up</a>`;} else { formTitle.textContent = 'Create Your Account'; formSubtitle.textContent = 'Join MentorX as a mentor or mentee.'; nameInputGroup.classList.remove('hidden'); optionsGroup.style.display = 'none'; submitButton.textContent = 'Sign Up'; toggleContainer.innerHTML = `Already have an account? <a href="#" id="toggleLink">Log In</a>`; } toggleCoursesField(); setupToggleLink(); };
 
             async function handleFormSubmit(event) {
                 event.preventDefault();
                 const role = document.querySelector('input[name="role"]:checked').value;
+                const email = emailInput.value;
+                const password = passwordInput.value;
+
                 if (isLoginMode) {
                     try {
                         const response = await fetch('https://api-mentorx.onrender.com/api/auth/login', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ email: emailInput.value, password: passwordInput.value, role }),
+                            body: JSON.stringify({ email, password, role }),
                         });
                         const data = await response.json();
                         if (response.ok) {
                             localStorage.setItem('token', data.token);
                             localStorage.setItem('user', JSON.stringify(data.user));
-
-                            // --- CORRECTED REDIRECT LOGIC FOR FLAT FILE STRUCTURE ---
-                            let path;
-                            switch (role) {
-                                case 'mentee':
-                                    path = 'Mentee.html'; // No leading slash or folder
-                                    break;
-                                case 'mentor':
-                                    path = 'mentor.html'; // No leading slash or folder
-                                    break;
-                                case 'admin':
-                                    path = 'admin.html';   // No leading slash or folder
-                                    break;
-                                default:
-                                    path = 'index.html';
-                            }
-                            window.location.href = path;
-                            // --- END OF CORRECTION ---
-
+                            window.location.href = data.redirectUrl || '/';
                         } else {
                             alert(data.msg || 'Login failed.');
                         }
@@ -137,7 +126,41 @@
                         alert('Could not connect to the server.');
                     }
                 } else {
-                    // Registration logic...
+                    // --- ADDED REGISTRATION LOGIC ---
+                    const name = nameInput.value;
+                    if (!name) {
+                        nameError.textContent = 'Please enter your full name.';
+                        return;
+                    }
+
+                    const payload = { name, email, password, role };
+                    
+                    if (role === 'mentor') {
+                        payload.specializedCourses = Array.from(selectedCourses);
+                    }
+
+                    try {
+                        const response = await fetch('https://api-mentorx.onrender.com/api/auth/register', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload),
+                        });
+                        const data = await response.json();
+                        if (response.ok) {
+                            let successMessage = 'Registration successful! You can now log in.';
+                            if (role === 'mentor') {
+                                successMessage = 'Registration successful! Your account is pending admin approval.';
+                            }
+                            alert(successMessage);
+                            toggleFormMode();
+                        } else {
+                            alert(data.msg || 'Registration failed.');
+                        }
+                    } catch (error) {
+                        console.error('Registration request failed:', error);
+                        alert('Could not connect to the server.');
+                    }
+                    // --- END OF REGISTRATION LOGIC ---
                 }
             }
             
